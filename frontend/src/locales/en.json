@@ -1,0 +1,30 @@
+{
+    "operator": "Operator",
+    "machine": "Machine",
+    "shift": "Shift",
+    "logout": "Logout",
+    "current_color": "Current Color",
+    "cycle": "Cycle",
+    "i_changed_needle": "I Changed the Needle",
+    "needle_changed": "Needle Changed ✓",
+    "supervisor_confirm": "Supervisor Confirm / Not Confirm",
+    "supervisor_verified": "Supervisor Verified ✓",
+    "refreshing_logs": "Refreshing logs…",
+    "login_title": "Needle Tracking — Operator Login",
+    "scan_badge": "Scan your badge code",
+    "scan_badge_placeholder": "Scan badge or type badge code",
+    "select_machine": "Select machine",
+    "login_btn": "Login",
+    "operator_not_found": "Operator not found. Check badge.",
+    "failed_to_load_machines": "Failed to load machines",
+    "scan_once_msg": "Scan once per shift — machine selection is required.",
+    "scanBadge": "Scan your badge code",
+    "selectMachine": "Please select a machine",
+    "login": "Login",
+    "title": "Needle Tracking — Operator Login",
+    "select": "Select machine",
+    "muted": "Scan once per shift — machine selection is required.",
+    "error": "Failed to load machines"
+    
+  }
+  

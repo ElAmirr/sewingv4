@@ -1,0 +1,19 @@
+# Node
+node_modules/
+
+# Electron build output
+dist/
+out/
+build/
+
+# Executables
+*.exe
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db

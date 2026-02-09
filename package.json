@@ -1,0 +1,55 @@
+{
+  "name": "electron-react-express",
+  "version": "1.0.0",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix frontend\" \"npm start --prefix backend\" \"electron .\"",
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "com.yourcompany.yourapp",
+    "productName": "MyElectronApp",
+    "files": [
+      "electron/**/*",
+      "frontend/dist/**/*",
+      "backend/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "backend/**/*",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "backend",
+        "to": "backend"
+      },
+      {
+        "from": "frontend/dist",
+        "to": "frontend/dist"
+      },
+      {
+        "from": "settings.json",
+        "to": "settings.json"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "electron/sewing.png"
+    }
+  },
+  "dependencies": {
+    "async-mutex": "^0.5.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "mysql2": "^3.15.3"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "electron": "^40.0.0",
+    "electron-builder": "^26.4.0",
+    "wait-on": "^9.0.3"
+  }
+}
