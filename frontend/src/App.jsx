@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import LoginPage from "./components/LoginPage";
 import MachinePage from "./components/MachinePage";
 import MiniView from "./components/MiniView";
-import WindowControls from "./components/WindowControls";
 
 
 export default function App() {
@@ -21,20 +20,11 @@ export default function App() {
   const [windowState, setWindowState] = useState("full");
 
   useEffect(() => {
-    const handleState = (event, state) => setWindowState(state);
-
-    if (window.electron && window.electron.ipcRenderer) {
-      window.electron.ipcRenderer.on("window-state", handleState);
-    } else if (window.require) {
-      const { ipcRenderer } = window.require("electron");
-      ipcRenderer.on("window-state", handleState);
+    // Check if we are in mini mode via URL param
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("mode") === "mini") {
+      setWindowState("mini");
     }
-
-    return () => {
-      if (window.electron && window.electron.ipcRenderer) {
-        window.electron.ipcRenderer.removeListener("window-state", handleState);
-      }
-    };
   }, []);
 
   const handleLogin = (data) => {
@@ -53,7 +43,6 @@ export default function App() {
         <MiniView />
       ) : (
         <>
-          <WindowControls />
           {!session ? (
             <LoginPage
               onLogin={handleLogin}

@@ -212,8 +212,8 @@ export default function MachinePage({ operator, machine, onLogout }) {
       </div>
 
       {/* TOP BAR */}
-      <header className="top-bar blue-glass" style={{ cursor: 'move', WebkitAppRegion: 'drag' }}>
-        <div className="top-bar-container" style={{ WebkitAppRegion: 'no-drag' }}>
+      <header className="top-bar blue-glass">
+        <div className="top-bar-container">
           <div className="top-item">
             <span className="label">{t.operator}</span>
             <strong>{operator.name}</strong>
@@ -230,7 +230,7 @@ export default function MachinePage({ operator, machine, onLogout }) {
           </div>
         </div>
 
-        <div className="top-btn" style={{ WebkitAppRegion: 'no-drag' }}>
+        <div className="top-btn">
           {!audioUnlocked && (
             <svg
               onClick={unlockAudio}

@@ -22,13 +22,11 @@ log('=== Application Starting ===');
 log(`App path: ${app.getAppPath()}`);
 log(`User data path: ${app.getPath('userData')}`);
 log(`__dirname: ${__dirname}`);
-log(`Process platform: ${process.platform}`);
 log(`Process argv: ${JSON.stringify(process.argv)}`);
 
 let mainWindow;
+let miniWindow;
 let backendProcess;
-let isMini = false;
-let lastFullBounds = null;
 
 function createWindow() {
   log('Creating main window...');
@@ -42,8 +40,7 @@ function createWindow() {
       x: width - windowWidth,
       y: 0,
       alwaysOnTop: true,
-      frame: false, // Frameless for custom controls
-      transparent: true,
+      frame: true, // Standard frame restored
       icon: path.join(__dirname, 'sewing.png'),
       webPreferences: {
         nodeIntegration: true,
@@ -54,6 +51,13 @@ function createWindow() {
     log('Loading URL: http://localhost:5000');
     mainWindow.loadURL("http://localhost:5000");
 
+    // Standard Minimize triggers Mini Mode
+    mainWindow.on("minimize", (event) => {
+      event.preventDefault();
+      mainWindow.hide();
+      createMiniWindow();
+    });
+
     mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
       log(`Window failed to load: ${errorCode} - ${errorDescription}`);
     });
@@ -62,47 +66,56 @@ function createWindow() {
       log('Window finished loading');
     });
 
-    mainWindow.on("closed", () => {
-      log('Main window closed');
-      mainWindow = null;
-    });
-
-    // IPC Listeners for Window Controls
-    ipcMain.on("minimize-window", () => {
-      if (mainWindow) {
-        lastFullBounds = mainWindow.getBounds();
-        const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
-
-        isMini = true;
-        mainWindow.setAlwaysOnTop(true, "screen-saver");
-        mainWindow.setBounds({
-          x: screenWidth - 120,
-          y: screenHeight - 120,
-          width: 100,
-          height: 100
-        }, true);
-        mainWindow.webContents.send("window-state", "mini");
-      }
-    });
-
-    ipcMain.on("restore-window", () => {
-      if (mainWindow && lastFullBounds) {
-        isMini = false;
-        mainWindow.setBounds(lastFullBounds, true);
-        mainWindow.webContents.send("window-state", "full");
-      }
-    });
-
-    ipcMain.on("close-window", () => {
-      if (mainWindow) mainWindow.close();
-    });
-
     log('Main window created successfully');
   } catch (error) {
     log(`Error creating window: ${error.message}`);
     log(`Error stack: ${error.stack}`);
   }
 }
+
+function createMiniWindow() {
+  if (miniWindow) return;
+
+  const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
+
+  miniWindow = new BrowserWindow({
+    width: 100,
+    height: 100,
+    x: screenWidth - 120,
+    y: screenHeight - 120,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    resizable: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  });
+
+  miniWindow.loadURL("http://localhost:5000?mode=mini");
+
+  miniWindow.on("closed", () => {
+    miniWindow = null;
+  });
+}
+
+// IPC Listeners
+ipcMain.on("restore-window", () => {
+  if (miniWindow) {
+    miniWindow.close();
+  }
+  if (mainWindow) {
+    mainWindow.show();
+    mainWindow.restore();
+    mainWindow.setAlwaysOnTop(true);
+  }
+});
+
+ipcMain.on("close-window", () => {
+  if (mainWindow) mainWindow.close();
+});
 
 function startBackend() {
   return new Promise((resolve, reject) => {

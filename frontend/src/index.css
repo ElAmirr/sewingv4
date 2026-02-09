@@ -74,41 +74,6 @@ button:focus-visible {
   }
 }
 
-/* ================= WINDOW CONTROLS ================= */
-.window-controls {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  display: flex;
-  gap: 8px;
-  z-index: 9999;
-  -webkit-app-region: no-drag;
-}
-
-.control-btn {
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
-  border-radius: 50%;
-  transition: all 0.2s;
-}
-
-.control-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.1);
-}
-
-.control-btn.close:hover {
-  background: #ff4d4d;
-}
-
 /* ================= MINI VIEW (FLOATING) ================= */
 .app-root.mini {
   background: transparent !important;
