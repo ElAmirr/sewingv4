@@ -75,6 +75,15 @@ button:focus-visible {
 }
 
 /* ================= MINI VIEW (FLOATING) ================= */
+/* Force transparency on html and body for Electron mini-mode */
+.mini-mode,
+.mini-mode body,
+.mini-mode #root,
+.mini-mode .app-root {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
 .app-root.mini {
   background: transparent !important;
   display: flex;
@@ -83,14 +92,6 @@ button:focus-visible {
   overflow: hidden;
   width: 100vw;
   height: 100vh;
-}
-
-/* Force transparency on html and body for Electron mini-mode */
-body.mini-mode,
-body.mini-mode #root,
-body.mini-mode .app-root {
-  background: transparent !important;
-  background-color: transparent !important;
 }
 
 .mini-view {
@@ -109,12 +110,10 @@ body.mini-mode .app-root {
 }
 
 .mini-circle {
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, #3498db, #2980b9);
-  border-radius: 50%;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-  border: 3px solid white;
+  width: 90px;
+  height: 90px;
+  background: transparent;
+  /* Removed background gradient */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -126,9 +125,11 @@ body.mini-mode .app-root {
 }
 
 .mini-logo-img {
-  width: 55px;
-  height: 55px;
+  width: 90px;
+  height: 90px;
   object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+  /* Add shadow to the icon itself */
 }
 
 .pulse {

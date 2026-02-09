@@ -24,9 +24,9 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     if (params.get("mode") === "mini") {
       setWindowState("mini");
-      document.body.classList.add("mini-mode");
+      document.documentElement.classList.add("mini-mode");
     } else {
-      document.body.classList.remove("mini-mode");
+      document.documentElement.classList.remove("mini-mode");
     }
   }, []);
 

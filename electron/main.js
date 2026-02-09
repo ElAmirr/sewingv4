@@ -85,6 +85,7 @@ function createMiniWindow() {
     y: screenHeight - 120,
     frame: false,
     transparent: true,
+    backgroundColor: '#00000000', // Absolute transparency for Windows
     alwaysOnTop: true,
     skipTaskbar: true,
     resizable: false,
