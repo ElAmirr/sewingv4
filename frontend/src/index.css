@@ -81,6 +81,16 @@ button:focus-visible {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Force transparency on html and body for Electron mini-mode */
+body.mini-mode,
+body.mini-mode #root,
+body.mini-mode .app-root {
+  background: transparent !important;
+  background-color: transparent !important;
 }
 
 .mini-view {
@@ -89,8 +99,13 @@ button:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  cursor: grab;
   -webkit-app-region: drag;
+  user-select: none;
+}
+
+.mini-view:active {
+  cursor: grabbing;
 }
 
 .mini-circle {
