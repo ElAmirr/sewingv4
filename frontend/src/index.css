@@ -13,6 +13,25 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Aggressive Reset for Mini Mode */
+.mini-mode,
+.mini-mode body,
+.mini-mode #root {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  width: 120px !important;
+  height: 120px !important;
+  overflow: hidden !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.mini-mode ::-webkit-scrollbar {
+  display: none !important;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -75,34 +94,14 @@ button:focus-visible {
 }
 
 /* ================= MINI VIEW (FLOATING) ================= */
-/* Absolute transparency and scrollbar hiding for Electron mini-mode */
-.mini-mode,
-.mini-mode body,
-.mini-mode #root,
-.mini-mode .app-root {
-  background: transparent !important;
-  background-color: transparent !important;
-  overflow: hidden !important;
-}
-
-/* Aggressively hide all scrollbars globally in mini-mode */
-.mini-mode *::-webkit-scrollbar {
-  display: none !important;
-}
-
-.mini-mode * {
-  scrollbar-width: none !important;
-  /* Firefox */
-}
-
 .app-root.mini {
   background: transparent !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  width: 100vw;
-  height: 100vh;
+  width: 120px !important;
+  height: 120px !important;
+  overflow: hidden !important;
 }
 
 .mini-view {
@@ -111,10 +110,9 @@ button:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: grab;
+  cursor: pointer;
   -webkit-app-region: drag;
   user-select: none;
-  background: transparent !important;
 }
 
 .mini-view:active {
@@ -122,25 +120,30 @@ button:focus-visible {
 }
 
 .mini-circle {
-  width: 90px;
-  height: 90px;
-  background: transparent;
-  /* Removed background gradient */
+  width: 110px;
+  height: 110px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  border-radius: 50%;
+  border: 4px solid #3498db;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
-.mini-circle:hover {
-  transform: scale(1.1);
+.mini-view:hover .mini-circle {
+  transform: scale(1.05);
+  border-color: #2ecc71;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .mini-logo-img {
-  width: 110px;
-  height: 110px;
+  width: 80px;
+  height: 80px;
   object-fit: contain;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
   pointer-events: none;
   -webkit-user-drag: none;
 }
