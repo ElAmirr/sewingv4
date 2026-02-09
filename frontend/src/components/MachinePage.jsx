@@ -15,6 +15,10 @@ export default function MachinePage({ operator, machine, onLogout }) {
   const [audioUnlocked, setAudioUnlocked] = useState(false);
   const lastPlayedCycleRef = useRef(null);
 
+  if (!operator || !machine) {
+    return <div className="center-screen"><p className="error">Invalid Session. Please log in again.</p></div>;
+  }
+
   useEffect(() => {
     const audio = new Audio(alertSound);
     audio.loop = true;
@@ -120,7 +124,7 @@ export default function MachinePage({ operator, machine, onLogout }) {
     // Poll every 5 seconds for real-time updates (useful for barcodes and multi-PC sync)
     const interval = setInterval(fetchLatestStatus, 5000);
     return () => clearInterval(interval);
-  }, [machine.machine_id, cycleId]);
+  }, [machine?.machine_id, cycleId]);
 
   useEffect(() => {
     // reset UI on new cycle (local reset is still good for speed)
