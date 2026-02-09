@@ -91,9 +91,6 @@ function createHandleWindow() {
     });
 
     handleWindow.loadFile(path.join(__dirname, 'handle.html'));
-
-    // Ensure the icon is accessible if it's in the same directory
-    // In built app, we might need to handle this differently, but for now:
     log('Handle window created successfully');
   } catch (error) {
     log(`Error creating handle window: ${error.message}`);
@@ -116,6 +113,12 @@ ipcMain.on('hide-main-window', () => {
   if (mainWindow && mainWindow.isVisible()) {
     mainWindow.hide();
     log('Main window hidden via IPC');
+  }
+});
+
+ipcMain.on('move-handle', (event, pos) => {
+  if (handleWindow) {
+    handleWindow.setPosition(Math.round(pos.x), Math.round(pos.y));
   }
 });
 

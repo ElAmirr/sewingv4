@@ -9,58 +9,84 @@
             overflow: hidden;
             background: transparent;
             user-select: none;
-            -webkit-app-region: drag;
+        }
+
+        .handle-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .handle {
-            width: 50px;
-            height: 50px;
+            width: 54px;
+            height: 54px;
             background: rgba(255, 255, 255, 0.9);
-            background-image: url('sewing.png');
-            background-size: cover;
-            background-position: center;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: move;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            border: 2px solid #1E90FF;
-            transition: transform 0.2s;
-            -webkit-app-region: drag;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            border: 2px solid #1e90ff;
+            transition: transform 0.1s;
+            overflow: hidden;
         }
 
         .handle:hover {
-            transform: scale(1.1);
-            background: rgba(30, 144, 255, 1);
+            transform: scale(1.05);
+            background: white;
         }
 
         .handle:active {
             transform: scale(0.95);
         }
 
-        .icon {
-            color: white;
-            font-size: 24px;
-            font-family: Arial, sans-serif;
-            font-weight: bold;
+        .handle img {
+            width: 85%;
+            height: 85%;
+            object-fit: contain;
         }
     </style>
 </head>
 
 <body>
-    <div class="handle" id="toggleBtn">
+    <div class="handle-container">
+        <div class="handle" id="dragBtn">
+            <img src="sewing.png" alt="S" />
+        </div>
     </div>
 
     <script>
         const { ipcRenderer } = require('electron');
-        // Because dragging is enabled, we need a separate way to click or double click
-        // Or just use 'mouseup' if it hasn't moved much.
-        // Actually, for a small button, clicking still works with -webkit-app-region: drag
-        // but we might need double click to be safe. Let's try single click first.
-        document.getElementById('toggleBtn').onclick = () => {
-            ipcRenderer.send('toggle-main-window');
-        };
+
+        const btn = document.getElementById('dragBtn');
+        let isDragging = false;
+        let offset = { x: 0, y: 0 };
+
+        btn.addEventListener('mousedown', (e) => {
+            isDragging = false;
+            offset.x = e.screenX;
+            offset.y = e.screenY;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (Math.abs(e.screenX - offset.x) > 5 || Math.abs(e.screenY - offset.y) > 5) {
+                if (!isDragging) isDragging = true;
+                ipcRenderer.send('move-handle', {
+                    x: e.screenX - (btn.offsetWidth / 2),
+                    y: e.screenY - (btn.offsetHeight / 2)
+                });
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (!isDragging) {
+                ipcRenderer.send('toggle-main-window');
+            }
+            isDragging = false;
+        });
     </script>
 </body>
 
