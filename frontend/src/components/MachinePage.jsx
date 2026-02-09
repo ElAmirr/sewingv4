@@ -202,13 +202,6 @@ export default function MachinePage({ operator, machine, onLogout }) {
     }
   };
 
-  const handleHide = () => {
-    if (window.require) {
-      const { ipcRenderer } = window.require('electron');
-      ipcRenderer.send('hide-main-window');
-    }
-  };
-
   /* ===================== RENDER ===================== */
   return (
     <div className="dashboard">
@@ -219,8 +212,8 @@ export default function MachinePage({ operator, machine, onLogout }) {
       </div>
 
       {/* TOP BAR */}
-      <header className="top-bar blue-glass">
-        <div className="top-bar-container">
+      <header className="top-bar blue-glass" style={{ cursor: 'move', WebkitAppRegion: 'drag' }}>
+        <div className="top-bar-container" style={{ WebkitAppRegion: 'no-drag' }}>
           <div className="top-item">
             <span className="label">{t.operator}</span>
             <strong>{operator.name}</strong>
@@ -237,7 +230,7 @@ export default function MachinePage({ operator, machine, onLogout }) {
           </div>
         </div>
 
-        <div className="top-btn">
+        <div className="top-btn" style={{ WebkitAppRegion: 'no-drag' }}>
           {!audioUnlocked && (
             <svg
               onClick={unlockAudio}
@@ -272,9 +265,6 @@ export default function MachinePage({ operator, machine, onLogout }) {
           <div className="select-lang" onClick={handleLangClick}>
             <span className="lang">{currentLang}</span>
           </div>
-          <button className="btn outline" onClick={handleHide} style={{ marginRight: '10px' }}>
-            {t.hide || "Hide"}
-          </button>
           <button className="btn logout" onClick={handleLogout}>
             {t.logout}
           </button>
@@ -321,13 +311,15 @@ export default function MachinePage({ operator, machine, onLogout }) {
         </section>
       </main>
 
-      {showSupervisorModal && (
-        <SupervisorModal
-          logId={pendingLogId}
-          machineId={machine.machine_id}
-          onClose={handleSupervisorClosed}
-        />
-      )}
-    </div>
+      {
+        showSupervisorModal && (
+          <SupervisorModal
+            logId={pendingLogId}
+            machineId={machine.machine_id}
+            onClose={handleSupervisorClosed}
+          />
+        )
+      }
+    </div >
   );
 }

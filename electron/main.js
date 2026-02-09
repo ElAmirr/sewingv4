@@ -26,8 +26,9 @@ log(`Process platform: ${process.platform}`);
 log(`Process argv: ${JSON.stringify(process.argv)}`);
 
 let mainWindow;
-let handleWindow;
 let backendProcess;
+let isMini = false;
+let lastFullBounds = null;
 
 function createWindow() {
   log('Creating main window...');
@@ -41,6 +42,8 @@ function createWindow() {
       x: width - windowWidth,
       y: 0,
       alwaysOnTop: true,
+      frame: false, // Frameless for custom controls
+      transparent: true,
       icon: path.join(__dirname, 'sewing.png'),
       webPreferences: {
         nodeIntegration: true,
@@ -64,57 +67,42 @@ function createWindow() {
       mainWindow = null;
     });
 
+    // IPC Listeners for Window Controls
+    ipcMain.on("minimize-window", () => {
+      if (mainWindow) {
+        lastFullBounds = mainWindow.getBounds();
+        const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
+
+        isMini = true;
+        mainWindow.setAlwaysOnTop(true, "screen-saver");
+        mainWindow.setBounds({
+          x: screenWidth - 120,
+          y: screenHeight - 120,
+          width: 100,
+          height: 100
+        }, true);
+        mainWindow.webContents.send("window-state", "mini");
+      }
+    });
+
+    ipcMain.on("restore-window", () => {
+      if (mainWindow && lastFullBounds) {
+        isMini = false;
+        mainWindow.setBounds(lastFullBounds, true);
+        mainWindow.webContents.send("window-state", "full");
+      }
+    });
+
+    ipcMain.on("close-window", () => {
+      if (mainWindow) mainWindow.close();
+    });
+
     log('Main window created successfully');
   } catch (error) {
     log(`Error creating window: ${error.message}`);
     log(`Error stack: ${error.stack}`);
   }
 }
-
-function createHandleWindow() {
-  log('Creating handle window...');
-  try {
-    const { width } = screen.getPrimaryDisplay().workAreaSize;
-    handleWindow = new BrowserWindow({
-      width: 60,
-      height: 60,
-      x: width - 60,
-      y: 0,
-      frame: false,
-      transparent: true,
-      alwaysOnTop: true,
-      resizable: false,
-      webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false,
-      },
-    });
-
-    handleWindow.loadFile(path.join(__dirname, 'handle.html'));
-    log('Handle window created successfully');
-  } catch (error) {
-    log(`Error creating handle window: ${error.message}`);
-  }
-}
-
-ipcMain.on('toggle-main-window', () => {
-  if (mainWindow) {
-    if (mainWindow.isVisible()) {
-      mainWindow.hide();
-      log('Main window hidden');
-    } else {
-      mainWindow.show();
-      log('Main window shown');
-    }
-  }
-});
-
-ipcMain.on('hide-main-window', () => {
-  if (mainWindow && mainWindow.isVisible()) {
-    mainWindow.hide();
-    log('Main window hidden via IPC');
-  }
-});
 
 function startBackend() {
   return new Promise((resolve, reject) => {
@@ -212,7 +200,6 @@ app.on("ready", async () => {
     await startBackend();
     log('Backend started successfully');
     createWindow();
-    createHandleWindow();
   } catch (err) {
     log(`Failed to start: ${err.message}`);
     log(`Error stack: ${err.stack}`);

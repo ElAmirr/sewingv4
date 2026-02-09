@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import LoginPage from "./components/LoginPage";
 import MachinePage from "./components/MachinePage";
+import MiniView from "./components/MiniView";
+import WindowControls from "./components/WindowControls";
 
 
 export default function App() {
@@ -16,6 +18,25 @@ export default function App() {
     localStorage.setItem("lang", lang);
   }, [lang]);
 
+  const [windowState, setWindowState] = useState("full");
+
+  useEffect(() => {
+    const handleState = (event, state) => setWindowState(state);
+
+    if (window.electron && window.electron.ipcRenderer) {
+      window.electron.ipcRenderer.on("window-state", handleState);
+    } else if (window.require) {
+      const { ipcRenderer } = window.require("electron");
+      ipcRenderer.on("window-state", handleState);
+    }
+
+    return () => {
+      if (window.electron && window.electron.ipcRenderer) {
+        window.electron.ipcRenderer.removeListener("window-state", handleState);
+      }
+    };
+  }, []);
+
   const handleLogin = (data) => {
     setSession(data);
     localStorage.setItem("session", JSON.stringify(data));
@@ -27,21 +48,28 @@ export default function App() {
   };
 
   return (
-    <div className="app-root">
-      {!session ? (
-        <LoginPage 
-          onLogin={handleLogin} 
-          lang={lang}
-          onLangChange={setLang} 
-        />
+    <div className={`app-root ${windowState}`}>
+      {windowState === "mini" ? (
+        <MiniView />
       ) : (
-        <MachinePage
-          lang={lang}
-          onLangChange={setLang}
-          operator={session.operator}
-          machine={session.machine}
-          onLogout={handleLogout}
-        />
+        <>
+          <WindowControls />
+          {!session ? (
+            <LoginPage
+              onLogin={handleLogin}
+              lang={lang}
+              onLangChange={setLang}
+            />
+          ) : (
+            <MachinePage
+              lang={lang}
+              onLangChange={setLang}
+              operator={session.operator}
+              machine={session.machine}
+              onLogout={handleLogout}
+            />
+          )}
+        </>
       )}
     </div>
   );
