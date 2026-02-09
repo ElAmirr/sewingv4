@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: transparent;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+            /* Make the whole window draggable */
+            -webkit-app-region: drag;
+        }
+
+        .handle {
+            width: 60px;
+            height: 60px;
+            background: url('sewing.png') no-repeat center center;
+            background-size: contain;
+            /* background-color: rgba(30, 144, 255, 0.4); */
+            /* Optional subtle background */
+            border-radius: 12px;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); */
+            transition: transform 0.2s;
+            /* Clicks must be allowed to toggle */
+            -webkit-app-region: no-drag;
+        }
+
+        .handle:hover {
+            transform: scale(1.1);
+        }
+
+        .handle:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="handle" id="toggleBtn">
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        let isDragging = false;
+        let startX, startY;
+
+        // Simple threshold check for drag vs click
+        const btn = document.getElementById('toggleBtn');
+
+        btn.addEventListener('mousedown', (e) => {
+            isDragging = false;
+            startX = e.screenX;
+            startY = e.screenY;
+        });
+
+        btn.addEventListener('mousemove', (e) => {
+            if (Math.abs(e.screenX - startX) > 5 || Math.abs(e.screenY - startY) > 5) {
+                isDragging = true;
+            }
+        });
+
+        btn.addEventListener('mouseup', () => {
+            if (!isDragging) {
+                ipcRenderer.send('toggle-main-window');
+            }
+        });
+    </script>
+</body>
+
+</html>
