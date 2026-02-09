@@ -13,24 +13,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Aggressive Reset for Mini Mode */
-.mini-mode,
-.mini-mode body,
-.mini-mode #root {
-  min-width: 0 !important;
-  min-height: 0 !important;
-  width: 120px !important;
-  height: 120px !important;
-  overflow: hidden !important;
-  background: transparent !important;
-  background-color: transparent !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.mini-mode ::-webkit-scrollbar {
-  display: none !important;
-}
 
 a {
   font-weight: 500;
@@ -164,4 +146,44 @@ button:focus-visible {
   100% {
     box-shadow: 0 0 0 0px rgba(52, 152, 219, 0);
   }
+}
+
+/* ================= FINAL AGGRESSIVE MINI MODE RESET ================= */
+/* This MUST stay at the bottom of the file to guarantee total override */
+.mini-mode,
+.mini-mode body,
+.mini-mode #root {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  width: 120px !important;
+  height: 120px !important;
+  overflow: hidden !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.mini-mode ::-webkit-scrollbar {
+  display: none !important;
+}
+
+.mini-mode * {
+  scrollbar-width: none !important;
+}
+
+.mini-view {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  width: 120px !important;
+  height: 120px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  -webkit-app-region: drag;
+  cursor: pointer;
 }

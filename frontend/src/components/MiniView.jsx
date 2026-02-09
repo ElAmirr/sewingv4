@@ -16,10 +16,15 @@ export default function MiniView() {
     };
 
     return (
-        <div className="mini-view" onClick={handleRestore} title="Restore App">
+        <button
+            className="mini-view"
+            onClick={handleRestore}
+            title="Restore App"
+            aria-label="Restore Application"
+        >
             <div className="mini-circle">
                 <img src={sewingIcon} alt="Sewing Icon" className="mini-logo-img" />
             </div>
-        </div>
+        </button>
     );
 }

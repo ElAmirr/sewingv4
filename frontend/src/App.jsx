@@ -40,28 +40,26 @@ export default function App() {
     localStorage.removeItem("session");
   };
 
+  if (windowState === "mini") {
+    return <MiniView />;
+  }
+
   return (
     <div className={`app-root ${windowState}`}>
-      {windowState === "mini" ? (
-        <MiniView />
+      {!session ? (
+        <LoginPage
+          onLogin={handleLogin}
+          lang={lang}
+          onLangChange={setLang}
+        />
       ) : (
-        <>
-          {!session ? (
-            <LoginPage
-              onLogin={handleLogin}
-              lang={lang}
-              onLangChange={setLang}
-            />
-          ) : (
-            <MachinePage
-              lang={lang}
-              onLangChange={setLang}
-              operator={session.operator}
-              machine={session.machine}
-              onLogout={handleLogout}
-            />
-          )}
-        </>
+        <MachinePage
+          lang={lang}
+          onLangChange={setLang}
+          operator={session.operator}
+          machine={session.machine}
+          onLogout={handleLogout}
+        />
       )}
     </div>
   );
