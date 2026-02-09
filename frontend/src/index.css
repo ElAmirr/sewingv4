@@ -75,13 +75,19 @@ button:focus-visible {
 }
 
 /* ================= MINI VIEW (FLOATING) ================= */
-/* Force transparency on html and body for Electron mini-mode */
+/* Force transparency and hide scrollbars on all root elements for Electron mini-mode */
 .mini-mode,
 .mini-mode body,
 .mini-mode #root,
 .mini-mode .app-root {
   background: transparent !important;
   background-color: transparent !important;
+  overflow: hidden !important;
+}
+
+/* Aggressively hide scrollbars */
+.mini-mode ::-webkit-scrollbar {
+  display: none !important;
 }
 
 .app-root.mini {
@@ -128,8 +134,9 @@ button:focus-visible {
   width: 90px;
   height: 90px;
   object-fit: contain;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
-  /* Add shadow to the icon itself */
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+  /* Let drag pass through to container */
 }
 
 .pulse {

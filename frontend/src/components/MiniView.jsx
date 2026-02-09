@@ -16,10 +16,8 @@ export default function MiniView() {
     };
 
     return (
-        <div className="mini-view" onClick={handleRestore}>
-            <div className="mini-circle pulse">
-                <img src={sewingIcon} alt="Sewing Icon" className="mini-logo-img" />
-            </div>
+        <div className="mini-view" onClick={handleRestore} title="Restore App">
+            <img src={sewingIcon} alt="Sewing Icon" className="mini-logo-img" />
         </div>
     );
 }
