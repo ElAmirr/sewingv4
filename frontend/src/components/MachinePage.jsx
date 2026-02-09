@@ -88,8 +88,42 @@ export default function MachinePage({ operator, machine, onLogout }) {
 
   const cycleId = cycleStart.getTime();
 
+  /* ===================== AUTO SYNC ===================== */
+  const fetchLatestStatus = async () => {
+    try {
+      const res = await api.get(`/logs/${machine.machine_id}`);
+      const latestLog = res.data;
+
+      if (latestLog) {
+        // Only sync if it's the current cycle
+        const logCycleStart = new Date(latestLog.cycle_start_time).getTime();
+        if (logCycleStart === cycleId) {
+          setOperatorPressed(true);
+          setPendingLogId(latestLog.supervisor_id ? null : latestLog.log_id);
+          setSupervisorPressed(!!latestLog.supervisor_id);
+        } else {
+          // It's an old log from a previous cycle, ensure UI is clean
+          setOperatorPressed(false);
+          setSupervisorPressed(false);
+          setPendingLogId(null);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to sync status:", err);
+    }
+  };
+
   useEffect(() => {
-    // reset UI on new cycle
+    // Initial sync
+    fetchLatestStatus();
+
+    // Poll every 5 seconds for real-time updates (useful for barcodes and multi-PC sync)
+    const interval = setInterval(fetchLatestStatus, 5000);
+    return () => clearInterval(interval);
+  }, [machine.machine_id, cycleId]);
+
+  useEffect(() => {
+    // reset UI on new cycle (local reset is still good for speed)
     setOperatorPressed(false);
     setSupervisorPressed(false);
     setPendingLogId(null);
@@ -97,7 +131,7 @@ export default function MachinePage({ operator, machine, onLogout }) {
     if (alertAudio && audioUnlocked && lastPlayedCycleRef.current !== cycleId) {
       lastPlayedCycleRef.current = cycleId;
       alertAudio.currentTime = 0;
-      alertAudio.play().catch(() => {});
+      alertAudio.play().catch(() => { });
     }
   }, [cycleId, alertAudio, audioUnlocked]);
 
@@ -141,9 +175,11 @@ export default function MachinePage({ operator, machine, onLogout }) {
 
   const handleSupervisorClosed = (confirmed) => {
     setShowSupervisorModal(false);
-    setPendingLogId(null);
 
-    if (confirmed) setSupervisorPressed(true);
+    if (confirmed) {
+      setPendingLogId(null);
+      setSupervisorPressed(true);
+    }
   };
 
   /* ===================== LOGOUT ===================== */
@@ -259,9 +295,8 @@ export default function MachinePage({ operator, machine, onLogout }) {
           </button>
 
           <button
-            className={`btn big ${
-              supervisorPressed ? "btn-success" : operatorPressed ? "btn-attention" : "outline"
-            }`}
+            className={`btn big ${supervisorPressed ? "btn-success" : operatorPressed ? "btn-attention" : "outline"
+              }`}
             onClick={handleOpenSupervisor}
             disabled={!operatorPressed || supervisorPressed}
           >

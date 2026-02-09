@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { api } from "../api/api";
 import en from "../locales/en.json";
 import fr from "../locales/fr.json";
@@ -11,6 +11,7 @@ export default function LoginPage({ onLogin }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingMachines, setLoadingMachines] = useState(true);
+  const badgeRef = useRef(null);
 
   // Load language from localStorage or default EN
   const [lang, setLang] = useState(localStorage.getItem("lang") || "EN");
@@ -23,10 +24,27 @@ export default function LoginPage({ onLogin }) {
     setLoadingMachines(true);
     setError("");
     try {
-      const res = await api.get("/machines");
-      const list = Array.isArray(res.data) ? res.data : res.data?.machines ?? [];
+      const [resMachines, resConfig] = await Promise.all([
+        api.get("/machines"),
+        api.get("/config").catch(() => ({ data: { machineName: "" } })) // Fail gracefully
+      ]);
+
+      const list = Array.isArray(resMachines.data) ? resMachines.data : resMachines.data?.machines ?? [];
       setMachines(list);
-      if (list.length > 0) setMachineId(list[0].machine_id);
+
+      const localMachineName = resConfig.data?.machineName;
+      if (localMachineName && list.length > 0) {
+        // Try to match by code or name (assuming 'code' is the name in machines.json)
+        const matched = list.find(m => m.code === localMachineName);
+        if (matched) {
+          setMachineId(matched.machine_id);
+        } else if (list.length > 0) {
+          setMachineId(list[0].machine_id);
+        }
+      } else if (list.length > 0) {
+        setMachineId(list[0].machine_id);
+      }
+
     } catch (err) {
       console.error("Failed to load machines:", err);
       const msg =
@@ -43,6 +61,10 @@ export default function LoginPage({ onLogin }) {
   useEffect(() => {
     fetchMachines();
   }, []); // ✅ Already correct
+
+  useEffect(() => {
+    if (badgeRef.current) badgeRef.current.focus();
+  }, [loadingMachines, error]);
 
   // Cycle language: EN -> FR -> AR
   const handleLangClick = () => {
@@ -116,6 +138,7 @@ export default function LoginPage({ onLogin }) {
         ) : null}
 
         <input
+          ref={badgeRef}
           value={badge}
           onChange={(e) => setBadge(e.target.value)}
           onKeyDown={onKeyDown}

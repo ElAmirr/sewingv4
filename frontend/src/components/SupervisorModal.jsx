@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { api } from "../api/api";
 
 export default function SupervisorModal({ logId, machineId, onClose }) {
   const [badge, setBadge] = useState("");
   const [validation, setValidation] = useState("CONFIRMED");
   const [loading, setLoading] = useState(false);
+  const badgeRef = useRef(null);
+
+  useEffect(() => {
+    if (badgeRef.current) badgeRef.current.focus();
+  }, []);
 
   const handleSubmit = async () => {
     console.log("🟡 Supervisor submit clicked");
@@ -44,6 +49,7 @@ export default function SupervisorModal({ logId, machineId, onClose }) {
         <h3>Supervisor Validation</h3>
 
         <input
+          ref={badgeRef}
           value={badge}
           onChange={(e) => setBadge(e.target.value)}
           placeholder="Supervisor badge code"
