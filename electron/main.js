@@ -116,12 +116,6 @@ ipcMain.on('hide-main-window', () => {
   }
 });
 
-ipcMain.on('move-handle', (event, pos) => {
-  if (handleWindow) {
-    handleWindow.setPosition(Math.round(pos.x), Math.round(pos.y));
-  }
-});
-
 function startBackend() {
   return new Promise((resolve, reject) => {
     log('Starting backend...');
