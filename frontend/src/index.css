@@ -75,7 +75,7 @@ button:focus-visible {
 }
 
 /* ================= MINI VIEW (FLOATING) ================= */
-/* Force transparency and hide scrollbars on all root elements for Electron mini-mode */
+/* Absolute transparency and scrollbar hiding for Electron mini-mode */
 .mini-mode,
 .mini-mode body,
 .mini-mode #root,
@@ -85,9 +85,14 @@ button:focus-visible {
   overflow: hidden !important;
 }
 
-/* Aggressively hide scrollbars */
-.mini-mode ::-webkit-scrollbar {
+/* Aggressively hide all scrollbars globally in mini-mode */
+.mini-mode *::-webkit-scrollbar {
   display: none !important;
+}
+
+.mini-mode * {
+  scrollbar-width: none !important;
+  /* Firefox */
 }
 
 .app-root.mini {
@@ -101,14 +106,15 @@ button:focus-visible {
 }
 
 .mini-view {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: grab;
   -webkit-app-region: drag;
   user-select: none;
+  background: transparent !important;
 }
 
 .mini-view:active {
@@ -131,12 +137,12 @@ button:focus-visible {
 }
 
 .mini-logo-img {
-  width: 90px;
-  height: 90px;
+  width: 110px;
+  height: 110px;
   object-fit: contain;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
   pointer-events: none;
-  /* Let drag pass through to container */
+  -webkit-user-drag: none;
 }
 
 .pulse {

@@ -1,4 +1,9 @@
 import { app, BrowserWindow, screen, ipcMain } from "electron";
+
+// Aggressive transparency switches for Windows
+app.commandLine.appendSwitch('enable-transparent-visuals');
+app.commandLine.appendSwitch('disable-gpu'); // Sometimes needed for transparency on some hardware
+
 import { spawn } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -79,10 +84,10 @@ function createMiniWindow() {
   const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
 
   miniWindow = new BrowserWindow({
-    width: 100,
-    height: 100,
-    x: screenWidth - 120,
-    y: screenHeight - 120,
+    width: 120,
+    height: 120,
+    x: screenWidth - 140,
+    y: screenHeight - 140,
     frame: false,
     transparent: true,
     backgroundColor: '#00000000',
@@ -90,6 +95,7 @@ function createMiniWindow() {
     alwaysOnTop: true,
     skipTaskbar: true,
     resizable: false,
+    movable: true, // Should be true by default, but being explicit
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
