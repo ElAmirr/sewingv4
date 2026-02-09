@@ -272,8 +272,8 @@ export default function MachinePage({ operator, machine, onLogout }) {
           <div className="select-lang" onClick={handleLangClick}>
             <span className="lang">{currentLang}</span>
           </div>
-          <button className="btn outline" onClick={handleHide} style={{ marginRight: '10px' }}>
-            {t.hide || "Hide"}
+          <button className="btn outline" onClick={handleHide} style={{ marginRight: '10px', padding: '0.4em 0.8em' }} title="Minimize to Sidebar">
+            <span style={{ fontSize: '20px', fontWeight: 'bold' }}>−</span>
           </button>
           <button className="btn logout" onClick={handleLogout}>
             {t.logout}

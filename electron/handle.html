@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <style>
         body {
@@ -10,27 +11,34 @@
             user-select: none;
             -webkit-app-region: drag;
         }
+
         .handle {
             width: 50px;
             height: 50px;
-            background: rgba(30, 144, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
+            background-image: url('sewing.png');
+            background-size: cover;
+            background-position: center;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
+            cursor: move;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            border: 2px solid white;
-            transition: transform 0.2s, background 0.2s;
-            -webkit-app-region: no-drag;
+            border: 2px solid #1E90FF;
+            transition: transform 0.2s;
+            -webkit-app-region: drag;
         }
+
         .handle:hover {
             transform: scale(1.1);
             background: rgba(30, 144, 255, 1);
         }
+
         .handle:active {
             transform: scale(0.95);
         }
+
         .icon {
             color: white;
             font-size: 24px;
@@ -39,16 +47,21 @@
         }
     </style>
 </head>
+
 <body>
     <div class="handle" id="toggleBtn">
-        <span class="icon">S</span>
     </div>
 
     <script>
         const { ipcRenderer } = require('electron');
+        // Because dragging is enabled, we need a separate way to click or double click
+        // Or just use 'mouseup' if it hasn't moved much.
+        // Actually, for a small button, clicking still works with -webkit-app-region: drag
+        // but we might need double click to be safe. Let's try single click first.
         document.getElementById('toggleBtn').onclick = () => {
             ipcRenderer.send('toggle-main-window');
         };
     </script>
 </body>
+
 </html>
