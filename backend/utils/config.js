@@ -29,10 +29,11 @@ function getSettingsPath() {
 
     const possibleSettings = [
         path.join(appRoot, "settings.json"), // Next to .exe
-        path.join(process.resourcesPath, "settings.json"), // In resources
+        path.join(appRoot, "resources", "settings.json"), // Valid for many electron-builder configs
+        process.resourcesPath ? path.join(process.resourcesPath, "settings.json") : null, // In resources (if defined)
         path.join(__dirname, "../../settings.json"), // Dev: backend/utils/../../settings.json
         path.join(process.cwd(), "settings.json") // Fallback
-    ];
+    ].filter(Boolean);
 
     for (const p of possibleSettings) {
         if (fs.existsSync(p)) return p;
@@ -82,4 +83,18 @@ export function getDataDir() {
     }
 
     return dataPath;
+}
+
+export function getMachineName() {
+    const settingsPath = getSettingsPath();
+    if (settingsPath && fs.existsSync(settingsPath)) {
+        try {
+            const settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"));
+            return settings.machineName || "";
+        } catch (err) {
+            console.error("[Config] Error reading settings for machine name:", err);
+            return "";
+        }
+    }
+    return "";
 }

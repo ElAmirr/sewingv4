@@ -4,12 +4,17 @@ import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
+import { getMachineName } from "./utils/config.js";
+import { initScheduler } from "./utils/scheduler.js"; // Import scheduler
 
 import operatorRoutes from "./routes/operatorRoutes.js";
 import machineRoutes from "./routes/machineRoutes.js";
 import needleLogsRoutes from "./routes/needleLogsRoutes.js";
 
 dotenv.config();
+
+// Initialize Scheduler
+initScheduler();
 
 const app = express();
 
@@ -22,6 +27,11 @@ app.use(express.json());
 app.use("/operators", operatorRoutes);
 app.use("/machines", machineRoutes);
 app.use("/logs", needleLogsRoutes);
+
+app.get("/config", (req, res) => {
+  const machineName = getMachineName();
+  res.json({ machineName });
+});
 
 // ===== FRONTEND DIST SERVING =====
 const __filename = fileURLToPath(import.meta.url);

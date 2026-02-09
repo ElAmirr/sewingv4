@@ -1,12 +1,42 @@
 [
   {
-    "session_id": 7,
-    "machine_id": 1,
+    "session_id": 2,
+    "machine_id": 4,
+    "operator_id": 1,
+    "badge": "100100100",
+    "shift": "Shift1",
+    "started_at": "2026-02-09T11:21:39.041Z",
+    "last_heartbeat": "2026-02-09T11:21:39.041Z",
+    "ended_at": "2026-02-09T13:21:42.757Z"
+  },
+  {
+    "session_id": 4,
+    "machine_id": 5,
     "operator_id": 1,
     "badge": "100100100",
     "shift": "Shift2",
-    "started_at": "2026-01-27T13:26:26.593Z",
-    "last_heartbeat": "2026-01-27T13:26:26.593Z",
-    "ended_at": "2026-01-27T13:28:26.593Z"
+    "started_at": "2026-02-09T13:32:55.388Z",
+    "last_heartbeat": "2026-02-09T13:32:55.388Z",
+    "ended_at": "2026-02-09T13:33:59.889Z"
+  },
+  {
+    "session_id": 5,
+    "machine_id": 6,
+    "operator_id": 2,
+    "badge": "100100101",
+    "shift": "Shift2",
+    "started_at": "2026-02-09T13:34:30.853Z",
+    "last_heartbeat": "2026-02-09T13:34:30.853Z",
+    "ended_at": "2026-02-09T13:35:47.892Z"
+  },
+  {
+    "session_id": 6,
+    "machine_id": 3,
+    "operator_id": 1,
+    "badge": "100100100",
+    "shift": "Shift2",
+    "started_at": "2026-02-09T13:58:22.409Z",
+    "last_heartbeat": "2026-02-09T13:58:22.409Z",
+    "ended_at": null
   }
 ]

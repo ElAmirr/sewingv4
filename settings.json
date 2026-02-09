@@ -1,3 +1,4 @@
 {
-    "dataFolderPath": "./backend/data"
+    "dataFolderPath": "./backend/data",
+    "machineName": "FH3"
 }
