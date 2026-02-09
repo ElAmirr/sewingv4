@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: transparent;
+            user-select: none;
+            -webkit-app-region: drag;
+        }
+        .handle {
+            width: 50px;
+            height: 50px;
+            background: rgba(30, 144, 255, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 2px solid white;
+            transition: transform 0.2s, background 0.2s;
+            -webkit-app-region: no-drag;
+        }
+        .handle:hover {
+            transform: scale(1.1);
+            background: rgba(30, 144, 255, 1);
+        }
+        .handle:active {
+            transform: scale(0.95);
+        }
+        .icon {
+            color: white;
+            font-size: 24px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="handle" id="toggleBtn">
+        <span class="icon">S</span>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        document.getElementById('toggleBtn').onclick = () => {
+            ipcRenderer.send('toggle-main-window');
+        };
+    </script>
+</body>
+</html>

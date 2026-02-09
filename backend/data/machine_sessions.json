@@ -37,6 +37,16 @@
     "shift": "Shift2",
     "started_at": "2026-02-09T13:58:22.409Z",
     "last_heartbeat": "2026-02-09T13:58:22.409Z",
-    "ended_at": null
+    "ended_at": "2026-02-09T15:40:40.429Z"
+  },
+  {
+    "session_id": 7,
+    "machine_id": 1,
+    "operator_id": 1,
+    "badge": "100100100",
+    "shift": "Shift2",
+    "started_at": "2026-02-09T15:40:30.392Z",
+    "last_heartbeat": "2026-02-09T15:40:30.392Z",
+    "ended_at": "2026-02-09T15:40:36.529Z"
   }
 ]

@@ -1,5 +1,4 @@
-// electron/main.js
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, screen, ipcMain } from "electron";
 import { spawn } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -27,14 +26,20 @@ log(`Process platform: ${process.platform}`);
 log(`Process argv: ${JSON.stringify(process.argv)}`);
 
 let mainWindow;
+let handleWindow;
 let backendProcess;
 
 function createWindow() {
   log('Creating main window...');
   try {
+    const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+    const windowWidth = 500;
+
     mainWindow = new BrowserWindow({
-      width: 1200,
-      height: 800,
+      width: windowWidth,
+      height: height,
+      x: width - windowWidth,
+      y: 0,
       alwaysOnTop: true,
       icon: path.join(__dirname, 'sewing.png'),
       webPreferences: {
@@ -65,6 +70,51 @@ function createWindow() {
     log(`Error stack: ${error.stack}`);
   }
 }
+
+function createHandleWindow() {
+  log('Creating handle window...');
+  try {
+    const { width } = screen.getPrimaryDisplay().workAreaSize;
+    handleWindow = new BrowserWindow({
+      width: 60,
+      height: 60,
+      x: width - 60,
+      y: 0,
+      frame: false,
+      transparent: true,
+      alwaysOnTop: true,
+      resizable: false,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+      },
+    });
+
+    handleWindow.loadFile(path.join(__dirname, 'handle.html'));
+    log('Handle window created successfully');
+  } catch (error) {
+    log(`Error creating handle window: ${error.message}`);
+  }
+}
+
+ipcMain.on('toggle-main-window', () => {
+  if (mainWindow) {
+    if (mainWindow.isVisible()) {
+      mainWindow.hide();
+      log('Main window hidden');
+    } else {
+      mainWindow.show();
+      log('Main window shown');
+    }
+  }
+});
+
+ipcMain.on('hide-main-window', () => {
+  if (mainWindow && mainWindow.isVisible()) {
+    mainWindow.hide();
+    log('Main window hidden via IPC');
+  }
+});
 
 function startBackend() {
   return new Promise((resolve, reject) => {
@@ -162,6 +212,7 @@ app.on("ready", async () => {
     await startBackend();
     log('Backend started successfully');
     createWindow();
+    createHandleWindow();
   } catch (err) {
     log(`Failed to start: ${err.message}`);
     log(`Error stack: ${err.stack}`);

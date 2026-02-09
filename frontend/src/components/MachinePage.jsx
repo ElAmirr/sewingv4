@@ -202,6 +202,13 @@ export default function MachinePage({ operator, machine, onLogout }) {
     }
   };
 
+  const handleHide = () => {
+    if (window.require) {
+      const { ipcRenderer } = window.require('electron');
+      ipcRenderer.send('hide-main-window');
+    }
+  };
+
   /* ===================== RENDER ===================== */
   return (
     <div className="dashboard">
@@ -265,6 +272,9 @@ export default function MachinePage({ operator, machine, onLogout }) {
           <div className="select-lang" onClick={handleLangClick}>
             <span className="lang">{currentLang}</span>
           </div>
+          <button className="btn outline" onClick={handleHide} style={{ marginRight: '10px' }}>
+            {t.hide || "Hide"}
+          </button>
           <button className="btn logout" onClick={handleLogout}>
             {t.logout}
           </button>
