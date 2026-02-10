@@ -37,12 +37,12 @@ function createWindow() {
   log('Creating main window...');
   try {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-    const windowWidth = 500;
+    const halfWindowWidth = width / 2;
 
     mainWindow = new BrowserWindow({
-      width: windowWidth,
+      width: halfWindowWidth,
       height: height,
-      x: width - windowWidth,
+      x: halfWindowWidth,
       y: 0,
       alwaysOnTop: true,
       frame: true, // Standard frame restored
@@ -87,7 +87,7 @@ function createMiniWindow() {
     width: 400,
     height: 180,
     x: screenWidth - 420,
-    y: screenHeight - 200,
+    y: screenHeight - 320,
     frame: false,
     transparent: true,
     backgroundColor: '#00000000',
