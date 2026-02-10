@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { api } from "../api/api";
 import TimerBox from "./TimerBox";
 import SupervisorModal from "./SupervisorModal";
+import { getCycleInfo } from "../utils/timeUtils";
 
 import en from "../locales/en.json";
 import fr from "../locales/fr.json";
@@ -74,22 +75,7 @@ export default function MachinePage({ operator, machine, onLogout }) {
   }, []);
 
   /* ===================== CYCLE INFO ===================== */
-  const cycleHour = timeNow.getHours() - (timeNow.getHours() % 2);
-  const cycleStart = new Date(timeNow);
-  cycleStart.setHours(cycleHour, 0, 0, 0);
-  const cycleEnd = new Date(cycleStart);
-  cycleEnd.setHours(cycleStart.getHours() + 2);
-
-  const cyclesSinceMidnight = Math.floor(cycleStart.getHours() / 2);
-  const colors = ["Blue", "Green", "Yellow", "Red"];
-  const color = colors[cyclesSinceMidnight % colors.length];
-
-  // compute local shift (no DB dependency)
-  const hour = timeNow.getHours();
-  let shift = "Shift3";
-  if (hour >= 6 && hour < 14) shift = "Shift1";
-  else if (hour >= 14 && hour < 22) shift = "Shift2";
-
+  const { cycleStart, cycleEnd, color, shift } = getCycleInfo(timeNow);
   const cycleId = cycleStart.getTime();
 
   /* ===================== AUTO SYNC ===================== */
