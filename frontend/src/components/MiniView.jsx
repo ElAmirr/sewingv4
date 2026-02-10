@@ -21,11 +21,13 @@ export default function MiniView() {
     };
 
     return (
-        <button
-            className="mini-view-overlay"
-            onClick={handleRestore}
-            title="Restore App"
-            aria-label="Restore Application"
-        />
+        <div className="mini-view-container drag-region">
+            <button
+                className="mini-view-overlay no-drag"
+                onClick={handleRestore}
+                title="Restore App"
+                aria-label="Restore Application"
+            />
+        </div>
     );
 }

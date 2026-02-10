@@ -559,14 +559,15 @@ html.mini-mode,
 }
 
 /* THE FLOATING MINI-APP OVERLAY */
-.mini-view-overlay {
+.mini-view-overlay.no-drag {
+  -webkit-app-region: no-drag;
   border: none !important;
   background: transparent !important;
   padding: 0 !important;
   width: 100% !important;
   height: 100% !important;
   display: block !important;
-  -webkit-app-region: drag;
+  /* Drag handled by container */
   cursor: pointer;
   position: absolute;
   top: 0;
@@ -576,4 +577,30 @@ html.mini-mode,
 
 .mini-view-overlay:active {
   cursor: grabbing;
+}
+/* RE-ENABLE CLICK RESTORE: Separate drag from click */
+.mini-view-container.drag-region {
+  -webkit-app-region: drag !important;
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 999 !important;
+}
+
+.mini-view-overlay.no-drag {
+  -webkit-app-region: no-drag !important;
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  width: calc(100% - 10px) !important;
+  height: calc(100% - 10px) !important;
+  margin: 5px !important;
+  display: block !important;
+  cursor: pointer !important;
+  z-index: 1000 !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
 }
