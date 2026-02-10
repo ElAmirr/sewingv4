@@ -1,5 +1,4 @@
 import { app, BrowserWindow, screen, ipcMain } from "electron";
-import { autoUpdater } from "electron-updater";
 
 // Aggressive transparency switches for Windows
 app.commandLine.appendSwitch('enable-transparent-visuals');
@@ -85,10 +84,10 @@ function createMiniWindow() {
   const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
 
   miniWindow = new BrowserWindow({
-    width: 250,
-    height: 120,
-    x: screenWidth - 270,
-    y: screenHeight - 140,
+    width: 400,
+    height: 180,
+    x: screenWidth - 420,
+    y: screenHeight - 200,
     frame: false,
     transparent: true,
     backgroundColor: '#00000000',
@@ -222,7 +221,6 @@ app.on("ready", async () => {
     await startBackend();
     log('Backend started successfully');
     createWindow();
-    checkForUpdates();
   } catch (err) {
     log(`Failed to start: ${err.message}`);
     log(`Error stack: ${err.stack}`);
@@ -254,44 +252,6 @@ app.on("before-quit", () => {
   }
   logStream.end();
 });
-
-/* ===================== AUTO UPDATER ===================== */
-autoUpdater.logger = {
-  info: (m) => log(`[Updater INFO] ${m}`),
-  warn: (m) => log(`[Updater WARN] ${m}`),
-  error: (m) => log(`[Updater ERROR] ${m}`)
-};
-
-autoUpdater.on("checking-for-update", () => {
-  log("Checking for update...");
-});
-
-autoUpdater.on("update-available", (info) => {
-  log(`Update available: ${info.version}`);
-});
-
-autoUpdater.on("update-not-available", (info) => {
-  log("Update not available.");
-});
-
-autoUpdater.on("error", (err) => {
-  log(`Error in auto-updater: ${err}`);
-});
-
-autoUpdater.on("download-progress", (progressObj) => {
-  log(`Download speed: ${progressObj.bytesPerSecond} - Downloaded ${progressObj.percent}%`);
-});
-
-autoUpdater.on("update-downloaded", (info) => {
-  log("Update downloaded; will install on quit");
-  // Optional: auto-install immediately
-  // autoUpdater.quitAndInstall();
-});
-
-function checkForUpdates() {
-  log("Initializing auto-updater check...");
-  autoUpdater.checkForUpdatesAndNotify();
-}
 
 app.on("activate", () => {
   log('App activate event');

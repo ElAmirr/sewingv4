@@ -1,41 +1,31 @@
-import React, { useState, useEffect } from "react";
-import TimerBox from "./TimerBox";
-import { getCycleInfo } from "../utils/timeUtils";
+import React from "react";
 
 /**
- * MiniView component displayed when the app is in floating icon mode.
+ * MiniView component serves as a transparent overlay in floating mode.
+ * It handles window restoration on click and dragging for Electron.
  */
 export default function MiniView() {
-    const [timeNow, setTimeNow] = useState(new Date());
-
-    useEffect(() => {
-        const timer = setInterval(() => setTimeNow(new Date()), 1000);
-        return () => clearInterval(timer);
-    }, []);
-
-    const { cycleStart, cycleEnd } = getCycleInfo(timeNow);
-
     const handleRestore = () => {
-        if (window.electron && window.electron.ipcRenderer) {
-            window.electron.ipcRenderer.send("restore-window");
-        } else if (window.require) {
-            const { ipcRenderer } = window.require("electron");
-            ipcRenderer.send("restore-window");
+        try {
+            if (window.electron && window.electron.ipcRenderer) {
+                window.electron.ipcRenderer.send("restore-window");
+            } else if (typeof window.require === 'function') {
+                const electron = window.require("electron");
+                if (electron && electron.ipcRenderer) {
+                    electron.ipcRenderer.send("restore-window");
+                }
+            }
+        } catch (err) {
+            console.warn("Electron restore-window failed (likely running in browser):", err);
         }
     };
 
     return (
         <button
-            className="mini-view timer-mode"
+            className="mini-view-overlay"
             onClick={handleRestore}
             title="Restore App"
             aria-label="Restore Application"
-        >
-            <TimerBox
-                cycleStart={cycleStart.getTime()}
-                cycleEnd={cycleEnd.getTime()}
-                timeNow={timeNow.getTime()}
-            />
-        </button>
+        />
     );
 }

@@ -516,16 +516,15 @@ html.mini-mode,
 .mini-mode #root {
   min-width: 0 !important;
   min-height: 0 !important;
-  width: 250px !important;
-  height: 120px !important;
+  width: 400px !important;
+  height: 180px !important;
   overflow: hidden !important;
   background: transparent !important;
   background-color: transparent !important;
   margin: 0 !important;
   padding: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  display: block !important;
+  /* Changed from flex to block for scaling */
 }
 
 .mini-mode ::-webkit-scrollbar {
@@ -538,12 +537,17 @@ html.mini-mode,
 
 /* Scaling the dashboard content for mini mode */
 .mini-mode .mini-content-scaled {
-  transform: scale(0.24);
+  transform: scale(0.35);
+  /* Decreased from 0.6 to fit more content */
   transform-origin: top left;
-  width: 500px !important;
-  height: 1080px !important;
+  width: 1142px !important;
+  /* 400 / 0.35 ≈ 1142px */
+  height: 514px !important;
+  /* 180 / 0.35 ≈ 514px */
   pointer-events: none;
-  opacity: 0.5;
+  /* Let clicks pass to the overlay */
+  opacity: 1;
+  /* Reset opacity to full as requested */
   position: absolute;
   top: 0;
   left: 0;
@@ -554,50 +558,22 @@ html.mini-mode,
   background: transparent !important;
 }
 
-/* THE FLOATING TIMER BUTTON */
-.mini-view.timer-mode {
+/* THE FLOATING MINI-APP OVERLAY */
+.mini-view-overlay {
   border: none !important;
-  background: rgba(18, 76, 153, 0.45) !important;
-  backdrop-filter: blur(10px);
-  padding: 10px !important;
-  width: 240px !important;
-  height: 90px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  -webkit-app-region: drag;
-  cursor: grab;
-  position: relative;
-  z-index: 1000;
-  border-radius: 12px !important;
-  border: 2px solid #0ea5ff !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
-}
-
-.mini-view.timer-mode:hover {
-  background: rgba(18, 76, 153, 0.6) !important;
-  border-color: #2ecc71 !important;
-}
-
-.mini-mode .timer-box {
   background: transparent !important;
   padding: 0 !important;
-  gap: 2px !important;
-  pointer-events: none;
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  -webkit-app-region: drag;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
 }
 
-.mini-mode .big-time {
-  font-size: 32px !important;
-  color: #fff !important;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.mini-mode .muted {
-  font-size: 0.8rem !important;
-  color: rgba(255, 255, 255, 0.8) !important;
-}
-
-.mini-view:active {
+.mini-view-overlay:active {
   cursor: grabbing;
 }

@@ -5,9 +5,15 @@ import MiniView from "./components/MiniView";
 
 
 export default function App() {
-  const [session, setSession] = useState(
-    JSON.parse(localStorage.getItem("session")) || null
-  );
+  const [session, setSession] = useState(() => {
+    try {
+      const saved = localStorage.getItem("session");
+      return saved ? JSON.parse(saved) : null;
+    } catch (err) {
+      console.error("Failed to parse session from localStorage:", err);
+      return null;
+    }
+  });
 
   // Load saved language from localStorage or default to EN
   const [lang, setLang] = useState(localStorage.getItem("lang") || "EN");
