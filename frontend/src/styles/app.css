@@ -332,9 +332,9 @@ select option {
   /* Fade out original content slightly */
 }
 
-.mini-mode .dashboard {
+.mini-mode .dashboard,
+.mini-mode .center-screen {
   background-image: none !important;
-  /* Remove background image in mini mode */
   background: transparent !important;
 }
 
@@ -513,18 +513,19 @@ select option {
 /* This MUST stay at the bottom of the file to guarantee total override */
 html.mini-mode,
 .mini-mode body,
-.mini-mode #root {
+.mini-mode #root,
+.mini-mode .app-root {
   min-width: 0 !important;
   min-height: 0 !important;
   width: 400px !important;
   height: 180px !important;
   overflow: hidden !important;
-  background: #0a1428 !important;
-  /* Deep solid blue */
   margin: 0 !important;
   padding: 0 !important;
   display: block !important;
-  position: relative !important;
+  background-image: url("./pexels-cottonbro-6660921.jpg") !important;
+  background-position: center !important;
+  background-size: cover !important;
 }
 
 .mini-mode ::-webkit-scrollbar {
@@ -537,36 +538,25 @@ html.mini-mode,
 
 /* Scaling the dashboard content for mini mode */
 .mini-mode .mini-content-scaled {
-  width: 720px !important;
-  height: auto !important;
-  position: absolute !important;
-  top: 50% !important;
-  left: 50% !important;
-  /* (400 / 720 = 0.555...) - Using 0.55 to fit perfectly with tiny margin */
-  transform: translate(-50%, -50%) scale(0.55) !important;
-  transform-origin: center center !important;
+  transform: scale(0.35);
+  /* Decreased from 0.6 to fit more content */
+  transform-origin: top left;
+  width: 1142px !important;
+  /* 400 / 0.35 ≈ 1142px */
+  height: 514px !important;
+  /* 180 / 0.35 ≈ 514px */
   pointer-events: none;
+  /* Let clicks pass to the overlay */
   opacity: 1;
+  /* Reset opacity to full as requested */
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .mini-mode .dashboard {
-  background: transparent !important;
   background-image: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  width: 720px !important;
-  box-shadow: none !important;
-}
-
-.mini-mode .logo-flag,
-.mini-mode .top-btn .select-lang,
-.mini-mode .top-btn .logout {
-  display: none !important;
-  /* Hide extra UI in mini mode */
-}
-
-.mini-mode .top-bar {
-  padding: 10px !important;
+  background: transparent !important;
 }
 
 /* THE FLOATING MINI-APP OVERLAY */
