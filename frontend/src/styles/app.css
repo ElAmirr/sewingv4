@@ -519,14 +519,11 @@ html.mini-mode,
   width: 400px !important;
   height: 180px !important;
   overflow: hidden !important;
-  background: rgba(10, 20, 40, 0.95) !important;
-  /* Solid dark blue for clarity */
-  background-color: rgba(10, 20, 40, 0.95) !important;
+  background: #0a1428 !important;
+  /* Deep solid blue */
   margin: 0 !important;
   padding: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  display: block !important;
   position: relative !important;
 }
 
@@ -540,24 +537,25 @@ html.mini-mode,
 
 /* Scaling the dashboard content for mini mode */
 .mini-mode .mini-content-scaled {
-  transform: scale(0.55);
-  /* Fits 720px content into 400px perfectly */
-  transform-origin: center center;
   width: 720px !important;
   height: auto !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  /* (400 / 720 = 0.555...) - Using 0.55 to fit perfectly with tiny margin */
+  transform: translate(-50%, -50%) scale(0.55) !important;
+  transform-origin: center center !important;
   pointer-events: none;
   opacity: 1;
-  position: relative;
-  display: flex;
-  justify-content: center;
 }
 
 .mini-mode .dashboard {
-  background-image: none !important;
   background: transparent !important;
+  background-image: none !important;
   padding: 0 !important;
   margin: 0 !important;
   width: 720px !important;
+  box-shadow: none !important;
 }
 
 .mini-mode .logo-flag,
