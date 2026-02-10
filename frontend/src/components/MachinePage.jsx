@@ -59,7 +59,7 @@ export default function MachinePage({ operator, machine, onLogout }) {
   const [timeNow, setTimeNow] = useState(new Date());
 
   /* ===================== LANGUAGE ===================== */
-  const languages = [localStorage.getItem("lang") || "EN", "EN", "FR", "AR"];
+  const languages = [localStorage.getItem("lang") || "AR", "EN", "FR"];
   const dictMap = { EN: en, FR: fr, AR: ar };
   const [langIndex, setLangIndex] = useState(0);
   const currentLang = languages[langIndex];

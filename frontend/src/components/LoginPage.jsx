@@ -14,7 +14,7 @@ export default function LoginPage({ onLogin }) {
   const badgeRef = useRef(null);
 
   // Load language from localStorage or default EN
-  const [lang, setLang] = useState(localStorage.getItem("lang") || "EN");
+  const [lang, setLang] = useState(localStorage.getItem("lang") || "AR");
   useEffect(() => localStorage.setItem("lang", lang), [lang]);
   const dictMap = { EN: en, FR: fr, AR: ar };
   const t = dictMap[lang] || dictMap.EN;

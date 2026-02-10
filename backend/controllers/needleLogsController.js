@@ -36,10 +36,8 @@ export const createNeedleLog = async (req, res) => {
     const logFile = getMachineLogPath(machine_id);
     const logs = await readData(logFile);
 
-    // Simple ID generation within the daily file
-    // Note: If you need globally unique IDs, consider a different approach,
-    // but for daily machine files, this is often sufficient.
-    const log_id = logs.length ? logs[logs.length - 1].log_id + 1 : 1;
+    // Use Date.now() for unique IDs across daily files
+    const log_id = Date.now();
 
     const newLog = {
       log_id,
@@ -90,7 +88,11 @@ export const confirmNeedleChange = async (req, res) => {
       return res.status(404).json({ message: "No logs found for this machine" });
     }
 
-    const files = fs.readdirSync(machineDir).filter(f => f.endsWith(".json"));
+    // Sort files descending (YYYY-MM-DD) to find today's logs first
+    const files = fs.readdirSync(machineDir)
+      .filter(f => f.endsWith(".json"))
+      .sort((a, b) => b.localeCompare(a));
+
     let foundLog = null;
     let targetFile = null;
     let fileLogs = [];
@@ -99,7 +101,8 @@ export const confirmNeedleChange = async (req, res) => {
     for (const file of files) {
       const relPath = `machine_${machine_id}/${file}`;
       fileLogs = await readData(relPath);
-      foundLog = fileLogs.find(l => l.log_id === log_id);
+      // Use == to handle string/number comparison if log_id comes as string
+      foundLog = fileLogs.find(l => l.log_id == log_id);
       if (foundLog) {
         targetFile = relPath;
         break;

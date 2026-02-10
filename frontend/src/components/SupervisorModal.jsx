@@ -52,6 +52,7 @@ export default function SupervisorModal({ logId, machineId, onClose }) {
           ref={badgeRef}
           value={badge}
           onChange={(e) => setBadge(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
           placeholder="Supervisor badge code"
           className="input"
         />

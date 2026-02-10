@@ -519,12 +519,15 @@ html.mini-mode,
   width: 400px !important;
   height: 180px !important;
   overflow: hidden !important;
-  background: transparent !important;
-  background-color: transparent !important;
+  background: rgba(10, 20, 40, 0.95) !important;
+  /* Solid dark blue for clarity */
+  background-color: rgba(10, 20, 40, 0.95) !important;
   margin: 0 !important;
   padding: 0 !important;
-  display: block !important;
-  /* Changed from flex to block for scaling */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
 }
 
 .mini-mode ::-webkit-scrollbar {
@@ -537,25 +540,35 @@ html.mini-mode,
 
 /* Scaling the dashboard content for mini mode */
 .mini-mode .mini-content-scaled {
-  transform: scale(0.35);
-  /* Decreased from 0.6 to fit more content */
-  transform-origin: top left;
-  width: 1142px !important;
-  /* 400 / 0.35 ≈ 1142px */
-  height: 514px !important;
-  /* 180 / 0.35 ≈ 514px */
+  transform: scale(0.55);
+  /* Fits 720px content into 400px perfectly */
+  transform-origin: center center;
+  width: 720px !important;
+  height: auto !important;
   pointer-events: none;
-  /* Let clicks pass to the overlay */
   opacity: 1;
-  /* Reset opacity to full as requested */
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
+  display: flex;
+  justify-content: center;
 }
 
 .mini-mode .dashboard {
   background-image: none !important;
   background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 720px !important;
+}
+
+.mini-mode .logo-flag,
+.mini-mode .top-btn .select-lang,
+.mini-mode .top-btn .logout {
+  display: none !important;
+  /* Hide extra UI in mini mode */
+}
+
+.mini-mode .top-bar {
+  padding: 10px !important;
 }
 
 /* THE FLOATING MINI-APP OVERLAY */
@@ -578,6 +591,7 @@ html.mini-mode,
 .mini-view-overlay:active {
   cursor: grabbing;
 }
+
 /* RE-ENABLE CLICK RESTORE: Separate drag from click */
 .mini-view-container.drag-region {
   -webkit-app-region: drag !important;
