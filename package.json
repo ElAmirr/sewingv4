@@ -1,6 +1,12 @@
 {
   "name": "electron-react-express",
   "version": "1.0.0",
+  "description": "Sewing Machine Admin Dashboard with Auto-Updates",
+  "author": "ElAmirr",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ElAmirr/sewingv4.git"
+  },
   "main": "electron/main.js",
   "scripts": {
     "dev": "concurrently \"npm run dev --prefix frontend\" \"npm start --prefix backend\" \"electron .\"",
@@ -36,13 +42,33 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "electron/sewing.png"
+      "icon": "electron/sewing.png",
+      "publish": [
+        {
+          "provider": "github",
+          "owner": "ElAmirr",
+          "repo": "sewingv4"
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Sewing Admin"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "ElAmirr",
+      "repo": "sewingv4"
     }
   },
   "dependencies": {
     "async-mutex": "^0.5.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
+    "electron-updater": "^6.3.9",
     "express": "^5.2.1",
     "mysql2": "^3.15.3"
   },
