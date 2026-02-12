@@ -517,7 +517,7 @@ html.mini-mode,
 .mini-mode .app-root {
   min-width: 0 !important;
   min-height: 0 !important;
-  width: 400px !important;
+  width: 350px !important;
   height: 180px !important;
   overflow: hidden !important;
   margin: 0 !important;
@@ -551,7 +551,7 @@ html.mini-mode,
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -45%) scale(0.25);
+  transform: translate(-50%, -43%) scale(0.25);
   /* Reduced scale to fit 180px height better */
 }
 
@@ -590,6 +590,11 @@ html.mini-mode,
   top: 0 !important;
   left: 0 !important;
   z-index: 999 !important;
+  cursor: grab !important;
+}
+
+.mini-view-container.drag-region:active {
+  cursor: grabbing !important;
 }
 
 .mini-view-overlay.no-drag {
