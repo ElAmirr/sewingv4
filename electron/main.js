@@ -85,9 +85,9 @@ function createMiniWindow() {
 
   miniWindow = new BrowserWindow({
     width: 400,
-    height: 300,
+    height: 180,
     x: screenWidth - 420,
-    y: screenHeight - 340,
+    y: screenHeight - 320,
     frame: false,
     transparent: true,
     backgroundColor: '#00000000',
