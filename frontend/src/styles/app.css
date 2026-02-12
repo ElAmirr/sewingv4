@@ -540,7 +540,7 @@ html.mini-mode,
 .mini-mode .mini-content-scaled {
   transform: scale(0.35);
   /* Decreased from 0.6 to fit more content */
-  transform-origin: top left;
+  transform-origin: center;
   width: 1142px !important;
   /* 400 / 0.35 ≈ 1142px */
   height: 514px !important;
@@ -550,8 +550,9 @@ html.mini-mode,
   opacity: 1;
   /* Reset opacity to full as requested */
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.35);
 }
 
 .mini-mode .dashboard {
