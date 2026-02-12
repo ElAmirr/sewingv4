@@ -122,3 +122,25 @@ export const logoutOperator = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+export const validateSession = async (req, res) => {
+  const { session_id } = req.params;
+
+  if (!session_id) {
+    return res.status(400).json({ valid: false, message: "session_id required" });
+  }
+
+  try {
+    const sessions = await readData("machine_sessions.json");
+    const session = sessions.find(s => Number(s.session_id) === Number(session_id));
+
+    if (!session || session.ended_at) {
+      return res.json({ valid: false, message: "Session ended or not found" });
+    }
+
+    return res.json({ valid: true });
+  } catch (err) {
+    console.error("validateSession error:", err);
+    res.status(500).json({ valid: false, message: "Server error" });
+  }
+};

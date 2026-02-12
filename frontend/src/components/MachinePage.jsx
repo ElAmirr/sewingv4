@@ -13,7 +13,6 @@ import alertSound from "../assets/beep.mp3";
 export default function MachinePage({ operator, machine, onLogout }) {
   /* ===================== AUDIO ===================== */
   const [alertAudio, setAlertAudio] = useState(null);
-  const [audioUnlocked, setAudioUnlocked] = useState(false);
   const lastPlayedCycleRef = useRef(null);
 
   if (!operator || !machine) {
@@ -32,21 +31,6 @@ export default function MachinePage({ operator, machine, onLogout }) {
     };
   }, []);
 
-  const unlockAudio = () => {
-    if (!alertAudio) return;
-
-    alertAudio.muted = true;
-
-    alertAudio
-      .play()
-      .then(() => {
-        alertAudio.pause();
-        alertAudio.currentTime = 0;
-        alertAudio.muted = false;
-        setAudioUnlocked(true);
-      })
-      .catch((err) => console.error("Audio unlock failed", err));
-  };
 
   /* ===================== LOGS & SHIFT ===================== */
   const [logsRefreshing, setLogsRefreshing] = useState(false);
@@ -59,14 +43,18 @@ export default function MachinePage({ operator, machine, onLogout }) {
   const [timeNow, setTimeNow] = useState(new Date());
 
   /* ===================== LANGUAGE ===================== */
-  const languages = [localStorage.getItem("lang") || "AR", "EN", "FR"];
+  const [lang, setLang] = useState(localStorage.getItem("lang") || "AR");
   const dictMap = { EN: en, FR: fr, AR: ar };
-  const [langIndex, setLangIndex] = useState(0);
-  const currentLang = languages[langIndex];
-  const t = dictMap[currentLang];
+  const t = dictMap[lang] || dictMap.AR;
 
-  const handleLangClick = () =>
-    setLangIndex((prev) => (prev + 1) % languages.length);
+  const handleLangClick = () => {
+    const langs = ["EN", "FR", "AR"];
+    const currentIndex = langs.indexOf(lang);
+    const nextIndex = (currentIndex + 1) % langs.length;
+    const newLang = langs[nextIndex];
+    setLang(newLang);
+    localStorage.setItem("lang", newLang);
+  };
 
   /* ===================== TIMER ===================== */
   useEffect(() => {
@@ -81,6 +69,18 @@ export default function MachinePage({ operator, machine, onLogout }) {
   /* ===================== AUTO SYNC ===================== */
   const fetchLatestStatus = async () => {
     try {
+      // 1. Check session validity
+      const session_id = localStorage.getItem("session_id");
+      if (session_id) {
+        const valRes = await api.get(`/operators/validate/${session_id}`);
+        if (valRes.data && valRes.data.valid === false) {
+          console.warn("Session invalidated by server. Logging out.");
+          onLogout();
+          return;
+        }
+      }
+
+      // 2. Sync needle log status
       const res = await api.get(`/logs/${machine.machine_id}`);
       const latestLog = res.data;
 
@@ -97,6 +97,11 @@ export default function MachinePage({ operator, machine, onLogout }) {
           setSupervisorPressed(false);
           setPendingLogId(null);
         }
+      } else {
+        // No log exists for this machine, reset states
+        setOperatorPressed(false);
+        setSupervisorPressed(false);
+        setPendingLogId(null);
       }
     } catch (err) {
       console.error("Failed to sync status:", err);
@@ -112,18 +117,25 @@ export default function MachinePage({ operator, machine, onLogout }) {
     return () => clearInterval(interval);
   }, [machine?.machine_id, cycleId]);
 
+  // Manage alert sound based on cycle and operator state
   useEffect(() => {
-    // reset UI on new cycle (local reset is still good for speed)
-    setOperatorPressed(false);
-    setSupervisorPressed(false);
-    setPendingLogId(null);
+    if (!alertAudio) return;
 
-    if (alertAudio && audioUnlocked && lastPlayedCycleRef.current !== cycleId) {
+    // Only play if this is a new cycle AND the operator hasn't pressed the button yet
+    if (lastPlayedCycleRef.current !== cycleId && !operatorPressed) {
       lastPlayedCycleRef.current = cycleId;
       alertAudio.currentTime = 0;
-      alertAudio.play().catch(() => { });
+      alertAudio.play().catch(() => {
+        console.warn("Auto-play blocked. Waiting for interaction or interaction already happened.");
+      });
     }
-  }, [cycleId, alertAudio, audioUnlocked]);
+
+    // Stop the alert if the operator has pressed the button
+    if (operatorPressed && !alertAudio.paused) {
+      alertAudio.pause();
+      alertAudio.currentTime = 0;
+    }
+  }, [cycleId, operatorPressed, alertAudio]);
 
   /* ===================== STATUS ===================== */
   const getStatusForPress = (now, cycleStart) =>
@@ -217,39 +229,8 @@ export default function MachinePage({ operator, machine, onLogout }) {
         </div>
 
         <div className="top-btn">
-          {!audioUnlocked && (
-            <svg
-              onClick={unlockAudio}
-              title="Enable sound alerts"
-              xmlns="http://www.w3.org/2000/svg"
-              width="32"
-              height="32"
-              viewBox="0 0 24 24"
-              fill="white"
-            >
-              <path d="M3 9v6h4l5 5V4L7 9H3z" />
-              <line
-                x1="16"
-                y1="9"
-                x2="21"
-                y2="15"
-                stroke="red"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <line
-                x1="21"
-                y1="9"
-                x2="16"
-                y2="15"
-                stroke="red"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          )}
           <div className="select-lang" onClick={handleLangClick}>
-            <span className="lang">{currentLang}</span>
+            <span className="lang">{lang}</span>
           </div>
           <button className="btn logout" onClick={handleLogout}>
             {t.logout}
@@ -285,8 +266,7 @@ export default function MachinePage({ operator, machine, onLogout }) {
           </button>
 
           <button
-            className={`btn big ${supervisorPressed ? "btn-success" : operatorPressed ? "btn-attention" : "outline"
-              }`}
+            className={`btn big ${supervisorPressed ? "btn-success" : operatorPressed ? "btn-attention" : "outline"}`}
             onClick={handleOpenSupervisor}
             disabled={!operatorPressed || supervisorPressed}
           >
@@ -297,15 +277,13 @@ export default function MachinePage({ operator, machine, onLogout }) {
         </section>
       </main>
 
-      {
-        showSupervisorModal && (
-          <SupervisorModal
-            logId={pendingLogId}
-            machineId={machine.machine_id}
-            onClose={handleSupervisorClosed}
-          />
-        )
-      }
-    </div >
+      {showSupervisorModal && (
+        <SupervisorModal
+          logId={pendingLogId}
+          machineId={machine.machine_id}
+          onClose={handleSupervisorClosed}
+        />
+      )}
+    </div>
   );
 }

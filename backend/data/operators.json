@@ -1,4 +1,52 @@
 [
-  { "operator_id": 1, "name": "Samir", "badge": "100100100" },
-  { "operator_id": 2, "name": "Khaled", "badge": "100100101" }
+  {
+    "operator_id": 1,
+    "name": "Samir",
+    "badge": "100100100"
+  },
+  {
+    "operator_id": 2,
+    "name": "Khaled",
+    "badge": "100100101"
+  },
+  {
+    "operator_id": 3,
+    "name": "Ahmed",
+    "badge": "100100102"
+  },
+  {
+    "operator_id": 4,
+    "name": "Mohamed",
+    "badge": "100100103"
+  },
+  {
+    "operator_id": 5,
+    "name": "Ali",
+    "badge": "100100104"
+  },
+  {
+    "operator_id": 6,
+    "name": "Omar",
+    "badge": "100100105"
+  },
+  {
+    "operator_id": 7,
+    "name": "Youssef",
+    "badge": "100100106"
+  },
+  {
+    "operator_id": 8,
+    "name": "Hassan",
+    "badge": "100100107"
+  },
+  {
+    "operator_id": 9,
+    "name": "Mahmoud",
+    "badge": "100100108"
+  },
+  {
+    "operator_id": 10,
+    "name": "Mostafa",
+    "badge": "100100109"
+  }
 ]

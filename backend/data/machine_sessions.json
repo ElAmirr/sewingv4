@@ -1,25 +1,5 @@
 [
   {
-    "session_id": 2,
-    "machine_id": 4,
-    "operator_id": 1,
-    "badge": "100100100",
-    "shift": "Shift1",
-    "started_at": "2026-02-09T11:21:39.041Z",
-    "last_heartbeat": "2026-02-09T11:21:39.041Z",
-    "ended_at": "2026-02-09T13:21:42.757Z"
-  },
-  {
-    "session_id": 4,
-    "machine_id": 5,
-    "operator_id": 1,
-    "badge": "100100100",
-    "shift": "Shift2",
-    "started_at": "2026-02-09T13:32:55.388Z",
-    "last_heartbeat": "2026-02-09T13:32:55.388Z",
-    "ended_at": "2026-02-09T13:33:59.889Z"
-  },
-  {
     "session_id": 5,
     "machine_id": 6,
     "operator_id": 2,
@@ -30,23 +10,43 @@
     "ended_at": "2026-02-09T13:35:47.892Z"
   },
   {
-    "session_id": 7,
+    "session_id": 9,
     "machine_id": 1,
     "operator_id": 1,
     "badge": "100100100",
     "shift": "Shift2",
-    "started_at": "2026-02-09T15:40:30.392Z",
-    "last_heartbeat": "2026-02-09T15:40:30.392Z",
-    "ended_at": "2026-02-09T15:40:36.529Z"
+    "started_at": "2026-02-11T14:42:00.747Z",
+    "last_heartbeat": "2026-02-11T14:42:00.747Z",
+    "ended_at": "2026-02-11T14:44:07.010Z"
   },
   {
-    "session_id": 8,
+    "session_id": 14,
+    "machine_id": 7,
+    "operator_id": 1,
+    "badge": "100100100",
+    "shift": "Shift2",
+    "started_at": "2026-02-11T15:44:54.707Z",
+    "last_heartbeat": "2026-02-11T15:44:54.707Z",
+    "ended_at": "2026-02-11T15:45:23.077Z"
+  },
+  {
+    "session_id": 16,
+    "machine_id": 4,
+    "operator_id": 1,
+    "badge": "100100100",
+    "shift": "Shift2",
+    "started_at": "2026-02-11T15:57:16.837Z",
+    "last_heartbeat": "2026-02-11T15:57:16.837Z",
+    "ended_at": "2026-02-11T15:57:34.602Z"
+  },
+  {
+    "session_id": 17,
     "machine_id": 3,
     "operator_id": 1,
     "badge": "100100100",
-    "shift": "Shift3",
-    "started_at": "2026-02-09T21:24:12.787Z",
-    "last_heartbeat": "2026-02-09T21:24:12.787Z",
+    "shift": "Shift1",
+    "started_at": "2026-02-12T10:54:44.520Z",
+    "last_heartbeat": "2026-02-12T10:54:44.520Z",
     "ended_at": null
   }
 ]
