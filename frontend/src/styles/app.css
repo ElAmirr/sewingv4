@@ -517,7 +517,7 @@ html.mini-mode,
 .mini-mode .app-root {
   min-width: 0 !important;
   min-height: 0 !important;
-  width: 350px !important;
+  width: 320px !important;
   height: 180px !important;
   overflow: hidden !important;
   margin: 0 !important;
