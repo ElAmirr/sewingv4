@@ -1,14 +1,20 @@
 {
-  "name": "electron-react-express",
+  "name": "sewing-machine-monitor",
   "version": "1.0.0",
+  "description": "Sewing Machine Monitoring Application",
   "main": "electron/main.js",
+  "author": "Your Company",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ElAmirr/sewingv4.git"
+  },
   "scripts": {
     "dev": "concurrently \"npm run dev --prefix frontend\" \"npm start --prefix backend\" \"electron .\"",
     "build": "electron-builder"
   },
   "build": {
-    "appId": "com.yourcompany.yourapp",
-    "productName": "MyElectronApp",
+    "appId": "com.sewingmonitor.app",
+    "productName": "SewingMonitor",
     "files": [
       "electron/**/*",
       "frontend/dist/**/*",
@@ -37,12 +43,19 @@
     "win": {
       "target": "nsis",
       "icon": "electron/sewing.png"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "ElAmirr",
+      "repo": "sewingv4",
+      "releaseType": "release"
     }
   },
   "dependencies": {
     "async-mutex": "^0.5.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
+    "electron-updater": "^6.7.3",
     "express": "^5.2.1",
     "mysql2": "^3.15.3"
   },

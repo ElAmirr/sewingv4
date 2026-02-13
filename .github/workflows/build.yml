@@ -1,9 +1,11 @@
-name: Build Electron App
+name: Build and Release Electron App
 
 on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
@@ -35,13 +37,47 @@ jobs:
       - name: Install Root Dependencies
         run: npm ci
 
+      - name: Get version from package.json
+        id: package-version
+        run: |
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+          echo "Version: $version"
+
       - name: Build Electron App
         run: npm run build
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Artifacts
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.package-version.outputs.version }}
+          name: Release v${{ steps.package-version.outputs.version }}
+          draft: false
+          prerelease: false
+          files: |
+            dist/*.exe
+            dist/latest.yml
+          body: |
+            ## Release v${{ steps.package-version.outputs.version }}
+            
+            ### Changes
+            - Auto-generated release for version ${{ steps.package-version.outputs.version }}
+            
+            ### Installation
+            Download the `.exe` file and run it to install the application.
+            
+            ### Auto-Update
+            If you have a previous version installed, the app will automatically update to this version.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Build Artifacts (Backup)
         uses: actions/upload-artifact@v4
         with:
-          name: electron-app
-          path: dist/*.exe
+          name: electron-app-v${{ steps.package-version.outputs.version }}
+          path: |
+            dist/*.exe
+            dist/latest.yml

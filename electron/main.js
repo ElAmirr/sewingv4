@@ -8,6 +8,7 @@ import { spawn } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
+import { autoUpdater } from "electron-updater";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -107,6 +108,67 @@ function createMiniWindow() {
   miniWindow.on("closed", () => {
     miniWindow = null;
   });
+}
+
+// ================= AUTO-UPDATER CONFIGURATION =================
+// Configure auto-updater
+autoUpdater.logger = {
+  info: (msg) => log(`[AutoUpdater] ${msg}`),
+  warn: (msg) => log(`[AutoUpdater WARN] ${msg}`),
+  error: (msg) => log(`[AutoUpdater ERROR] ${msg}`),
+  debug: (msg) => log(`[AutoUpdater DEBUG] ${msg}`)
+};
+
+// Auto-updater event handlers
+autoUpdater.on('checking-for-update', () => {
+  log('[AutoUpdater] Checking for updates...');
+});
+
+autoUpdater.on('update-available', (info) => {
+  log(`[AutoUpdater] Update available: ${info.version}`);
+  if (mainWindow) {
+    mainWindow.webContents.send('update-available', info);
+  }
+});
+
+autoUpdater.on('update-not-available', (info) => {
+  log('[AutoUpdater] No updates available');
+});
+
+autoUpdater.on('error', (err) => {
+  log(`[AutoUpdater] Error: ${err.message}`);
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+  const msg = `Download speed: ${progressObj.bytesPerSecond} - Downloaded ${progressObj.percent}% (${progressObj.transferred}/${progressObj.total})`;
+  log(`[AutoUpdater] ${msg}`);
+  if (mainWindow) {
+    mainWindow.webContents.send('download-progress', progressObj);
+  }
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  log(`[AutoUpdater] Update downloaded: ${info.version}`);
+  if (mainWindow) {
+    mainWindow.webContents.send('update-downloaded', info);
+  }
+  // Auto-install update after 5 seconds
+  setTimeout(() => {
+    log('[AutoUpdater] Installing update...');
+    autoUpdater.quitAndInstall(false, true);
+  }, 5000);
+});
+
+// Function to check for updates
+function checkForUpdates() {
+  if (process.env.NODE_ENV !== 'development') {
+    log('[AutoUpdater] Checking for updates...');
+    autoUpdater.checkForUpdates().catch(err => {
+      log(`[AutoUpdater] Failed to check for updates: ${err.message}`);
+    });
+  } else {
+    log('[AutoUpdater] Skipping update check in development mode');
+  }
 }
 
 // IPC Listeners
@@ -221,6 +283,16 @@ app.on("ready", async () => {
     await startBackend();
     log('Backend started successfully');
     createWindow();
+
+    // Check for updates after 10 seconds (give app time to fully load)
+    setTimeout(() => {
+      checkForUpdates();
+    }, 10000);
+
+    // Check for updates every 4 hours
+    setInterval(() => {
+      checkForUpdates();
+    }, 4 * 60 * 60 * 1000);
   } catch (err) {
     log(`Failed to start: ${err.message}`);
     log(`Error stack: ${err.stack}`);
