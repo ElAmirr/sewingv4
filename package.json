@@ -1,6 +1,6 @@
 {
   "name": "sewing-machine-monitor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Sewing Machine Monitoring Application",
   "main": "electron/main.js",
   "author": "Your Company",
