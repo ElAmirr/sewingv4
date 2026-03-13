@@ -49,12 +49,10 @@ jobs:
 
       - name: Build Electron App
         run: npm run build
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.package-version.outputs.version }}
           name: Release v${{ steps.package-version.outputs.version }}
