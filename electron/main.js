@@ -181,6 +181,9 @@ ipcMain.on("restore-window", () => {
     mainWindow.show();
     mainWindow.restore();
     mainWindow.setAlwaysOnTop(true);
+
+    // Proactive update check when user interacts
+    checkForUpdates();
   }
 });
 
@@ -285,15 +288,15 @@ app.on("ready", async () => {
     log('Backend started successfully');
     createWindow();
 
-    // Check for updates after 10 seconds (give app time to fully load)
+    // Check for updates after 3 seconds (faster startup)
     setTimeout(() => {
       checkForUpdates();
-    }, 10000);
+    }, 3000);
 
-    // Check for updates every 4 hours
+    // Check for updates every 20 minutes
     setInterval(() => {
       checkForUpdates();
-    }, 4 * 60 * 60 * 1000);
+    }, 20 * 60 * 1000);
   } catch (err) {
     log(`Failed to start: ${err.message}`);
     log(`Error stack: ${err.stack}`);
