@@ -23,20 +23,20 @@ export const initScheduler = () => {
             hour12: false
         });
 
-        // Local Tunisia transition times (End of shifts)
-        const triggerTimes = ["06:00", "14:00", "22:00"];
+        // Local Tunisia transition times (1 minute before end of shifts)
+        const triggerTimes = ["05:59", "13:59", "21:59"];
 
         if (triggerTimes.includes(localTimeString)) {
-            console.log(`⏰ Triggering scheduled logout at ${localTimeString} Tunisia Time`);
+            console.log(`⏰ Triggering Early Staggered Logout at ${localTimeString} Tunisia Time`);
             logoutAllSessions();
         }
     }, 60000);
 
-    console.log("✅ Native scheduler initialized (Checks every 60s).");
+    console.log("✅ Native scheduler initialized (Checks every 60s, triggers 1m early).");
 };
 
 /**
- * Logs out all active sessions across all machines.
+ * Logs out all active sessions across all machines with a stagger delay.
  */
 export async function logoutAllSessions() {
     try {
@@ -48,6 +48,8 @@ export async function logoutAllSessions() {
 
         const machineDirs = fs.readdirSync(dataDir)
             .filter(d => d.startsWith("machine_") && fs.statSync(path.join(dataDir, d)).isDirectory());
+
+        console.log(`🚀 Starting staggered logout for ${machineDirs.length} machine directories...`);
 
         for (const mDir of machineDirs) {
             const sessionsDir = path.join(dataDir, mDir, "sessions");
@@ -72,12 +74,16 @@ export async function logoutAllSessions() {
                     await writeData(relPath, sessions);
                 }
             }
+
+            // Stagger: wait 3 seconds between each machine to avoid server spikes
+            console.log(`   ✅ Finished ${mDir}`);
+            await new Promise(resolve => setTimeout(resolve, 3000));
         }
 
         if (totalUpdated > 0) {
-            console.log(`✅ Auto-logged out ${totalUpdated} active sessions across all machines.`);
+            console.log(`✨ Sequential Auto-logout complete: ${totalUpdated} sessions updated.`);
         } else {
-            console.log("ℹ :No active sessions to log out.");
+            console.log("ℹ No active sessions were found to log out.");
         }
 
     } catch (err) {
