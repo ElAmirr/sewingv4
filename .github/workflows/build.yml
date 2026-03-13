@@ -51,36 +51,5 @@ jobs:
 
       - name: Build Electron App
         run: npm run build
-
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ steps.package-version.outputs.version }}
-          name: Release v${{ steps.package-version.outputs.version }}
-          draft: false
-          prerelease: false
-          files: |
-            dist/*.exe
-            dist/latest.yml
-          body: |
-            ## Release v${{ steps.package-version.outputs.version }}
-            
-            ### Changes
-            - Auto-generated release for version ${{ steps.package-version.outputs.version }}
-            
-            ### Installation
-            Download the `.exe` file and run it to install the application.
-            
-            ### Auto-Update
-            If you have a previous version installed, the app will automatically update to this version.
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Build Artifacts (Backup)
-        uses: actions/upload-artifact@v4
-        with:
-          name: electron-app-v${{ steps.package-version.outputs.version }}
-          path: |
-            dist/*.exe
-            dist/latest.yml
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
