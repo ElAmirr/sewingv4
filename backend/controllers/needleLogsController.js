@@ -2,15 +2,16 @@ import { readData, writeData } from "../utils/fileDb.js";
 import fs from "fs";
 import path from "path";
 import { getDataDir } from "../utils/config.js";
+import { getProductionDate, getTunisiaISO } from "../utils/timeHelper.js";
 
 // ================= HELPERS =================
 function getMachineLogPath(machineId, date = null) {
-  const d = date || new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+  const d = date || getProductionDate(); // Use Production Date instead of Calendar Date
   return `machine_${machineId}/${d}.json`;
 }
 
 function nowISO() {
-  return new Date().toISOString();
+  return getTunisiaISO(); // Use Tunisia GMT+1 ISO string
 }
 
 // ================= CONTROLLERS =================

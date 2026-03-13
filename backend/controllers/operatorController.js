@@ -1,6 +1,18 @@
 import { readData, writeData } from "../utils/fileDb.js";
+import { generateSessionId, parseSessionId, getSessionFilePath, getActiveSessions } from "../utils/sessionUtils.js";
+import { getTunisiaISO } from "../utils/timeHelper.js";
 
 // ---------------- Controllers ----------------
+
+export const getActiveOperators = async (req, res) => {
+  try {
+    const active = await getActiveSessions();
+    res.json(active);
+  } catch (err) {
+    console.error("getActiveOperators error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 export const loginOperator = async (req, res) => {
   const badge_code =
@@ -18,12 +30,15 @@ export const loginOperator = async (req, res) => {
     });
   }
 
-  // Determine shift
-  const hour = new Date().getHours();
+  // Determine shift (using local Tunisia hour)
+  // Shift 1: 22:00 - 06:00
+  // Shift 2: 06:00 - 14:00
+  // Shift 3: 14:00 - 22:00
+  const hour = Number(new Date().toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'Africa/Tunis' }));
   const shift =
-    hour >= 6 && hour < 14 ? "Shift1" :
-      hour >= 14 && hour < 22 ? "Shift2" :
-        "Shift3";
+    hour >= 6 && hour < 14 ? "Shift2" :
+      hour >= 14 && hour < 22 ? "Shift3" :
+        "Shift1";
 
   try {
     const operators = await readData("operators.json");
@@ -33,36 +48,41 @@ export const loginOperator = async (req, res) => {
       return res.status(401).json({ message: "Invalid badge" });
     }
 
-    let sessions = await readData("machine_sessions.json");
+    const sessionFile = getSessionFilePath(machine_id);
+    let sessions = await readData(sessionFile);
 
-    // check if machine is already in an active session
+    // check if machine is already in an active session (on this machine only)
     const activeSession = sessions.find(
       s => s.machine_id === machine_id && !s.ended_at
     );
     if (activeSession) {
+      // Return existing session if it's the same operator, else block
+      if (activeSession.operator_id === operator.operator_id) {
+        return res.json({
+          operator,
+          machine_id,
+          shift: activeSession.shift,
+          session_id: activeSession.session_id,
+        });
+      }
       return res.status(409).json({ message: "Machine already in use" });
     }
 
-    // delete old ended sessions for this machine
-    sessions = sessions.filter(
-      s => !(s.machine_id === machine_id && s.ended_at)
-    );
-
     // create new session
-    const session_id = sessions.length ? sessions[sessions.length - 1].session_id + 1 : 1;
+    const session_id = generateSessionId(machine_id);
     const newSession = {
       session_id,
       machine_id,
       operator_id: operator.operator_id,
       badge: operator.badge,
       shift,
-      started_at: new Date().toISOString(),
-      last_heartbeat: new Date().toISOString(),
+      started_at: getTunisiaISO(),
+      last_heartbeat: getTunisiaISO(),
       ended_at: null,
     };
     sessions.push(newSession);
 
-    await writeData("machine_sessions.json", sessions);
+    await writeData(sessionFile, sessions);
 
     return res.json({
       operator,
@@ -84,44 +104,35 @@ export const logoutOperator = async (req, res) => {
   }
 
   try {
-    let sessions = await readData("machine_sessions.json");
-
-    const now = new Date().toISOString();
-
-    let updated = false;
+    let targetFile = null;
+    let targetSessions = [];
+    let sessionToUpdate = null;
 
     if (session_id) {
-      const session = sessions.find(s => Number(s.session_id) === Number(session_id) && !s.ended_at);
-      if (session) {
-        session.ended_at = now;
-        updated = true;
+      const info = parseSessionId(session_id);
+      if (info) {
+        targetFile = getSessionFilePath(info.machineId, info.dateISO);
+        targetSessions = await readData(targetFile);
+        sessionToUpdate = targetSessions.find(s => s.session_id === session_id && !s.ended_at);
       }
-    } else if (machine_id && operator_id) {
-      const session = sessions.find(
-        s => Number(s.machine_id) === Number(machine_id) &&
-          Number(s.operator_id) === Number(operator_id) &&
-          !s.ended_at
-      );
-      if (session) {
-        session.ended_at = now;
-        updated = true;
-      }
-    } else if (machine_id) {
-      const session = sessions.find(s => Number(s.machine_id) === Number(machine_id) && !s.ended_at);
-      if (session) {
-        session.ended_at = now;
-        updated = true;
-      }
+    } else {
+      // Fallback for old sessions or missing IDs (global search if needed, but here we enforce id)
+      return res.status(400).json({ message: "session_id is required for reliable logout" });
     }
 
-    if (updated) await writeData("machine_sessions.json", sessions);
+    if (sessionToUpdate) {
+      sessionToUpdate.ended_at = getTunisiaISO();
+      await writeData(targetFile, targetSessions);
+      return res.json({ success: true, message: "Logged out successfully" });
+    }
 
-    res.json({ success: updated, message: updated ? "Logged out successfully" : "No active session found" });
+    res.json({ success: false, message: "No active session found" });
   } catch (err) {
     console.error("logoutOperator error:", err);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 export const validateSession = async (req, res) => {
   const { session_id } = req.params;
@@ -131,8 +142,18 @@ export const validateSession = async (req, res) => {
   }
 
   try {
-    const sessions = await readData("machine_sessions.json");
-    const session = sessions.find(s => Number(s.session_id) === Number(session_id));
+    const info = parseSessionId(session_id);
+    if (!info) {
+      // Check legacy global file for compatibility during migration
+      const legacySessions = await readData("machine_sessions.json");
+      const legacySession = legacySessions.find(s => String(s.session_id) === String(session_id));
+      if (legacySession && !legacySession.ended_at) return res.json({ valid: true });
+      return res.json({ valid: false, message: "Invalid session format or session not found" });
+    }
+
+    const sessionFile = getSessionFilePath(info.machineId, info.dateISO);
+    const sessions = await readData(sessionFile);
+    const session = sessions.find(s => s.session_id === session_id);
 
     if (!session || session.ended_at) {
       return res.json({ valid: false, message: "Session ended or not found" });
@@ -144,3 +165,4 @@ export const validateSession = async (req, res) => {
     res.status(500).json({ valid: false, message: "Server error" });
   }
 };
+

@@ -41,6 +41,8 @@ export default function MachinePage({ operator, machine, onLogout }) {
   const [supervisorPressed, setSupervisorPressed] = useState(false);
 
   const [timeNow, setTimeNow] = useState(new Date());
+  const [submitting, setSubmitting] = useState(false);
+  const [initialSyncComplete, setInitialSyncComplete] = useState(false);
 
   /* ===================== LANGUAGE ===================== */
   const [lang, setLang] = useState(localStorage.getItem("lang") || "AR");
@@ -105,6 +107,8 @@ export default function MachinePage({ operator, machine, onLogout }) {
       }
     } catch (err) {
       console.error("Failed to sync status:", err);
+    } finally {
+      setInitialSyncComplete(true);
     }
   };
 
@@ -143,7 +147,10 @@ export default function MachinePage({ operator, machine, onLogout }) {
 
   /* ===================== OPERATOR PRESS ===================== */
   const handleOperatorPress = async () => {
+    if (submitting || !initialSyncComplete) return;
+
     try {
+      setSubmitting(true);
       if (alertAudio) {
         alertAudio.pause();
         alertAudio.currentTime = 0;
@@ -169,6 +176,8 @@ export default function MachinePage({ operator, machine, onLogout }) {
       // optional: refresh logs
     } catch (err) {
       console.error(err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -258,11 +267,17 @@ export default function MachinePage({ operator, machine, onLogout }) {
         {/* ACTIONS */}
         <section className="action-card blue-glass">
           <button
-            className={`btn big ${operatorPressed ? "btn-success" : "primary"}`}
+            className={`btn big ${operatorPressed ? "btn-success" : (submitting || !initialSyncComplete) ? "disabled" : "primary"}`}
             onClick={handleOperatorPress}
-            disabled={operatorPressed}
+            disabled={operatorPressed || submitting || !initialSyncComplete}
           >
-            {operatorPressed ? t.needle_changed : t.i_changed_needle}
+            {operatorPressed
+              ? t.needle_changed
+              : !initialSyncComplete
+                ? (lang === "AR" ? "جاري المزامنة..." : "Synchronizing...")
+                : submitting
+                  ? (lang === "AR" ? "جاري التسجيل..." : "Logging...")
+                  : t.i_changed_needle}
           </button>
 
           <button

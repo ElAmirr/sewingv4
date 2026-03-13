@@ -17,9 +17,9 @@ export function getCycleInfo(timeNow) {
 
     // compute local shift
     const hour = timeNow.getHours();
-    let shift = "Shift3";
-    if (hour >= 6 && hour < 14) shift = "Shift1";
-    else if (hour >= 14 && hour < 22) shift = "Shift2";
+    let shift = "Shift1"; // 22:00 - 06:00
+    if (hour >= 6 && hour < 14) shift = "Shift2";
+    else if (hour >= 14 && hour < 22) shift = "Shift3";
 
     return { cycleStart, cycleEnd, color, shift };
 }

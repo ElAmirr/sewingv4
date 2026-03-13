@@ -1,30 +1,33 @@
 import { readData, writeData } from "./fileDb.js";
+import { getDataDir } from "./config.js";
+import fs from "fs";
 import path from "path";
+import { getTunisiaISO } from "./timeHelper.js";
 
 /**
  * Initializes the cron jobs for auto-logout without external dependencies.
- * Checks the time every minute.
+ * Checks the local Tunisia time every minute.
  */
 export const initScheduler = () => {
-    console.log("⏳ Initializing Zero-Dependency Auto-Logout Scheduler...");
+    console.log("⏳ Initializing Tunisia-Local Auto-Logout Scheduler...");
 
     // Check every minute (60,000 ms)
     setInterval(() => {
         const now = new Date();
 
-        // Use Intl to get GMT hours and minutes
-        const gmtTimeString = now.toLocaleString("en-GB", {
-            timeZone: "GMT",
+        // Use Tunisia local time for triggers
+        const localTimeString = now.toLocaleString("en-GB", {
+            timeZone: "Africa/Tunis",
             hour: "2-digit",
             minute: "2-digit",
             hour12: false
         });
 
-        // Target GMT times: 13:00, 21:00, 05:00
-        const triggerTimes = ["13:00", "21:00", "05:00"];
+        // Local Tunisia transition times (End of shifts)
+        const triggerTimes = ["06:00", "14:00", "22:00"];
 
-        if (triggerTimes.includes(gmtTimeString)) {
-            console.log(`⏰ Triggering scheduled logout at ${gmtTimeString} GMT`);
+        if (triggerTimes.includes(localTimeString)) {
+            console.log(`⏰ Triggering scheduled logout at ${localTimeString} Tunisia Time`);
             logoutAllSessions();
         }
     }, 60000);
@@ -33,26 +36,48 @@ export const initScheduler = () => {
 };
 
 /**
- * Logs out all active sessions.
+ * Logs out all active sessions across all machines.
  */
 export async function logoutAllSessions() {
     try {
-        const sessions = await readData("machine_sessions.json");
-        const now = new Date().toISOString();
-        let updatedCount = 0;
+        const dataDir = getDataDir();
+        const nowISO = getTunisiaISO();
+        let totalUpdated = 0;
 
-        sessions.forEach(session => {
-            if (!session.ended_at) {
-                session.ended_at = now;
-                updatedCount++;
+        if (!fs.existsSync(dataDir)) return;
+
+        const machineDirs = fs.readdirSync(dataDir)
+            .filter(d => d.startsWith("machine_") && fs.statSync(path.join(dataDir, d)).isDirectory());
+
+        for (const mDir of machineDirs) {
+            const sessionsDir = path.join(dataDir, mDir, "sessions");
+            if (!fs.existsSync(sessionsDir)) continue;
+
+            const sessionFiles = fs.readdirSync(sessionsDir).filter(f => f.endsWith(".json"));
+
+            for (const sFile of sessionFiles) {
+                const relPath = `${mDir}/sessions/${sFile}`;
+                const sessions = await readData(relPath);
+                let fileUpdated = false;
+
+                sessions.forEach(session => {
+                    if (!session.ended_at) {
+                        session.ended_at = nowISO;
+                        fileUpdated = true;
+                        totalUpdated++;
+                    }
+                });
+
+                if (fileUpdated) {
+                    await writeData(relPath, sessions);
+                }
             }
-        });
+        }
 
-        if (updatedCount > 0) {
-            await writeData("machine_sessions.json", sessions);
-            console.log(`✅ Auto-logged out ${updatedCount} active sessions.`);
+        if (totalUpdated > 0) {
+            console.log(`✅ Auto-logged out ${totalUpdated} active sessions across all machines.`);
         } else {
-            console.log("ℹ️ No active sessions to log out.");
+            console.log("ℹ :No active sessions to log out.");
         }
 
     } catch (err) {
