@@ -5,6 +5,7 @@ export default function SupervisorModal({ logId, machineId, onClose }) {
   const [badge, setBadge] = useState("");
   const [validation, setValidation] = useState(""); // EMPTY by default
   const [loading, setLoading] = useState(false);
+  const [errorMSG, setErrorMSG] = useState(""); // Local error state
   const badgeRef = useRef(null);
 
   useEffect(() => {
@@ -15,13 +16,14 @@ export default function SupervisorModal({ logId, machineId, onClose }) {
     console.log("🟡 Supervisor submit clicked");
 
     if (!badge.trim()) {
-      console.error("❌ Supervisor badge missing");
-      return alert("Scan supervisor badge");
+      setErrorMSG("Badge code is empty");
+      if (badgeRef.current) badgeRef.current.focus();
+      return;
     }
 
     if (!validation) {
-      console.error("❌ Validation status missing");
-      return alert("Please select a validation status");
+      setErrorMSG("Please choose one status");
+      return;
     }
 
     const payload = {
@@ -42,7 +44,7 @@ export default function SupervisorModal({ logId, machineId, onClose }) {
     } catch (err) {
       console.error("❌ Supervisor submit error:", err.response?.data || err);
       // ERROR MANAGEMENT: Don't close the modal, let them try again!
-      alert(err.response?.data?.error || "Failed to submit supervisor validation. Please check badge and try again.");
+      setErrorMSG("Incorrect badge code");
       setBadge(""); // Clear badge for a fresh scan
       if (badgeRef.current) badgeRef.current.focus();
     } finally {
@@ -55,15 +57,16 @@ export default function SupervisorModal({ logId, machineId, onClose }) {
       <div className="modal glass-card blue-glass">
         <h3>Supervisor Validation</h3>
 
-        <div style={{ marginBottom: "15px" }}>
-          <label className="muted" style={{ display: "block", marginBottom: "8px" }}>Scan Badge</label>
+        <div className="modal-field">
+          <label className="label">Scan Badge</label>
           <input
             ref={badgeRef}
             value={badge}
             onChange={(e) => setBadge(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && !loading && validation && handleSubmit()}
+            onKeyDown={(e) => e.key === "Enter" && !loading && handleSubmit()}
             placeholder="Supervisor badge code"
             className="input"
+            style={{ width: "95%" }}
           />
         </div>
 
@@ -89,11 +92,13 @@ export default function SupervisorModal({ logId, machineId, onClose }) {
           </div>
         </div>
 
+        {errorMSG && <div className="field-error" style={{ marginBottom: "15px" }}>{errorMSG}</div>}
+
         <div className="btn-row">
           <button
             onClick={handleSubmit}
-            disabled={loading || !validation || !badge.trim()}
-            className={`btn primary ${(!validation || !badge.trim()) ? "disabled" : ""}`}
+            disabled={loading}
+            className={`btn primary ${loading ? "disabled" : ""}`}
           >
             {loading ? "Submitting..." : "Submit"}
           </button>

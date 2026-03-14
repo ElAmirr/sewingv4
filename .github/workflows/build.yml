@@ -57,7 +57,7 @@ jobs:
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: SewingMonitor-v1.2.2
+          name: SewingMonitor-v1.3.4
           path: |
             dist/*.exe
             dist/latest.yml

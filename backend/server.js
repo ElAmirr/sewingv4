@@ -10,11 +10,13 @@ import { initScheduler } from "./utils/scheduler.js"; // Import scheduler
 import operatorRoutes from "./routes/operatorRoutes.js";
 import machineRoutes from "./routes/machineRoutes.js";
 import needleLogsRoutes from "./routes/needleLogsRoutes.js";
+import { initStorageWatchdog, getStorageStatus } from "./utils/storageWatchdog.js";
 
 dotenv.config();
 
-// Initialize Scheduler
+// Initialize Schedulers
 initScheduler();
+initStorageWatchdog();
 
 const app = express();
 
@@ -27,6 +29,11 @@ app.use(express.json());
 app.use("/operators", operatorRoutes);
 app.use("/machines", machineRoutes);
 app.use("/logs", needleLogsRoutes);
+
+app.get("/health/storage", (req, res) => {
+  const isConnected = getStorageStatus();
+  res.json({ connected: isConnected });
+});
 
 app.get("/config", (req, res) => {
   const machineName = getMachineName();

@@ -147,25 +147,29 @@ select:focus {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin: 20px 0;
+  margin: 15px 0 25px 0;
+  width: 100%;
 }
 
 .radio-option {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 18px;
+  padding: 16px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(18, 76, 153, 0.1);
+  border: 1px solid rgba(18, 76, 153, 0.2);
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
+  width: 100%;
+  box-sizing: border-box;
+  /* Crucial for width alignment */
 }
 
 .radio-option:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: var(--accent);
+  background: rgba(18, 76, 153, 0.15);
+  border-color: rgba(14, 165, 255, 0.5);
 }
 
 .radio-option.selected {
@@ -183,6 +187,7 @@ select:focus {
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .selected .radio-circle {
@@ -210,6 +215,79 @@ select:focus {
 
 .selected .radio-label {
   color: #fff;
+}
+
+/* Modal Layout Adjustments */
+.modal-field {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.modal-field .label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.field-error {
+  color: #ff4d4d;
+  font-size: 0.85rem;
+  margin-top: 6px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.btn-row .btn {
+  flex: 1;
+  margin-right: 0;
+  /* Override default margin */
+}
+
+/* Server Health Status Indicators */
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-dot {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+.status-dot.online {
+  background-color: #10b981;
+  /* Green */
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+.status-dot.offline {
+  background-color: #ef4444;
+  /* Red */
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+
+.status-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+}
+
+.status-dot.offline+.status-label {
+  color: #ef4444;
 }
 
 select option {
@@ -428,7 +506,7 @@ select option {
 }
 
 .top-bar-container {
-  width: 35%;
+  width: 60%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -470,9 +548,8 @@ select option {
 }
 
 .select-lang {
-  width: 30px;
-  text-align: center;
-  margin-right: 20px;
+  display: flex;
+  justify-content: space-between;
 }
 
 .lang {
@@ -483,7 +560,7 @@ select option {
   display: flex;
   justify-content: space-around;
   align-items: center;
-
+  gap: 10px;
 }
 
 

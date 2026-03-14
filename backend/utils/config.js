@@ -42,59 +42,57 @@ function getSettingsPath() {
     return null;
 }
 
+let cachedSettings = null;
+let cachedDataPath = null;
+
+function loadSettings() {
+    if (cachedSettings) return cachedSettings;
+
+    const settingsPath = getSettingsPath();
+    if (!settingsPath) {
+        console.log("[Config] No settings.json found, using defaults");
+        cachedSettings = {};
+        return cachedSettings;
+    }
+
+    try {
+        console.log(`[Config] Reading settings: ${settingsPath}`);
+        const content = fs.readFileSync(settingsPath, "utf-8");
+        cachedSettings = JSON.parse(content);
+        console.log(`[Config] Loaded Settings:`, cachedSettings);
+    } catch (err) {
+        console.error("[Config] Error reading settings.json:", err);
+        cachedSettings = {};
+    }
+
+    return cachedSettings;
+}
+
 // Function to resolve data directory
 export function getDataDir() {
+    if (cachedDataPath) return cachedDataPath;
+
+    const settings = loadSettings();
     const settingsPath = getSettingsPath();
 
     // Default to internal data folder if no settings found
     let dataPath = path.join(__dirname, "../data");
 
-    if (settingsPath) {
-        try {
-            console.log(`[Config] Found settings file at: ${settingsPath}`);
-            const settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"));
-            console.log(`[Config] Settings content:`, settings);
-
-            if (settings.dataFolderPath) {
-                // If path is absolute, use it. If relative, resolve relative to settings file.
-                if (path.isAbsolute(settings.dataFolderPath)) {
-                    dataPath = settings.dataFolderPath;
-                } else {
-                    dataPath = path.resolve(path.dirname(settingsPath), settings.dataFolderPath);
-                }
-                console.log(`[Config] Resolved data path from settings: ${dataPath}`);
-            }
-        } catch (err) {
-            console.error("[Config] Error reading settings.json:", err);
+    if (settings.dataFolderPath && settingsPath) {
+        // If path is absolute, use it. If relative, resolve relative to settings file.
+        if (path.isAbsolute(settings.dataFolderPath)) {
+            dataPath = settings.dataFolderPath;
+        } else {
+            dataPath = path.resolve(path.dirname(settingsPath), settings.dataFolderPath);
         }
-    } else {
-        console.log("[Config] No settings.json found, using default internal path");
     }
 
-    // Ensure it exists? Or let the controllers handle it? 
-    // Controllers usually check fs.existsSync(file). 
-    // We should probably ensure the dir exists if we can.
-    console.log(`[Config] Final Validated Data Path: ${dataPath}`);
-    console.log(`[Config] Path exists? ${fs.existsSync(dataPath)}`);
-    if (!fs.existsSync(dataPath)) {
-        // Attempt to create it if it doesn't exist? 
-        // Or just return it and let file operations fail/create.
-        // Given the previous code created the dir, we should probably confirm this is valid.
-    }
-
-    return dataPath;
+    cachedDataPath = dataPath;
+    console.log(`[Config] Final Data Path: ${cachedDataPath} (Exists: ${fs.existsSync(cachedDataPath)})`);
+    return cachedDataPath;
 }
 
 export function getMachineName() {
-    const settingsPath = getSettingsPath();
-    if (settingsPath && fs.existsSync(settingsPath)) {
-        try {
-            const settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"));
-            return settings.machineName || "";
-        } catch (err) {
-            console.error("[Config] Error reading settings for machine name:", err);
-            return "";
-        }
-    }
-    return "";
+    const settings = loadSettings();
+    return settings.machineName || "";
 }

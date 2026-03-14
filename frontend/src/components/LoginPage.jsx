@@ -60,7 +60,24 @@ export default function LoginPage({ onLogin }) {
 
   useEffect(() => {
     fetchMachines();
-  }, []); // ✅ Already correct
+  }, []);
+
+  /* ===================== STORAGE HEALTH ===================== */
+  const [storageConnected, setStorageConnected] = useState(true);
+  const checkStorageHealth = async () => {
+    try {
+      const res = await api.get("/health/storage");
+      setStorageConnected(res.data.connected);
+    } catch (err) {
+      setStorageConnected(false);
+    }
+  };
+
+  useEffect(() => {
+    checkStorageHealth();
+    const interval = setInterval(checkStorageHealth, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (badgeRef.current) badgeRef.current.focus();
@@ -119,6 +136,12 @@ export default function LoginPage({ onLogin }) {
       <div className="action-card blue-glass login-card">
         <div className="select-lang" onClick={handleLangClick}>
           <span className="lang">{lang}</span>
+          <div className="status-indicator">
+            <span className={`status-dot ${storageConnected ? "online" : "offline"}`}></span>
+            <span className="status-label">
+              {storageConnected ? t.server_ok : t.server_error}
+            </span>
+          </div>
         </div>
 
         <h1>{t.title}</h1>

@@ -121,6 +121,25 @@ export default function MachinePage({ operator, machine, onLogout }) {
     return () => clearInterval(interval);
   }, [machine?.machine_id, cycleId]);
 
+  /* ===================== STORAGE HEALTH ===================== */
+  const [storageConnected, setStorageConnected] = useState(true);
+
+  const checkStorageHealth = async () => {
+    try {
+      const res = await api.get("/health/storage");
+      setStorageConnected(res.data.connected);
+    } catch (err) {
+      console.error("Health check failed:", err);
+      setStorageConnected(false); // If backend is unreachable, assume bad
+    }
+  };
+
+  useEffect(() => {
+    checkStorageHealth();
+    const interval = setInterval(checkStorageHealth, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Manage alert sound based on cycle and operator state
   useEffect(() => {
     if (!alertAudio) return;
@@ -208,7 +227,6 @@ export default function MachinePage({ operator, machine, onLogout }) {
       onLogout(); // logout on UI even if backend fails
     }
   };
-
   /* ===================== RENDER ===================== */
   return (
     <div className="dashboard">
@@ -234,6 +252,13 @@ export default function MachinePage({ operator, machine, onLogout }) {
           <div className="top-item">
             <span className="label">{t.shift}</span>
             <strong>{shift}</strong>
+          </div>
+
+          <div className="status-indicator">
+            <span className={`status-dot ${storageConnected ? "online" : "offline"}`}></span>
+            <span className="status-label">
+              {storageConnected ? t.server_ok : t.server_error}
+            </span>
           </div>
         </div>
 
