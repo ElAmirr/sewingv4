@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { api } from "../api/api";
 import TimerBox from "./TimerBox";
 import SupervisorModal from "./SupervisorModal";
-import { getCycleInfo } from "../utils/timeUtils";
+import { getCycleInfo, toTunisiaISO } from "../utils/timeUtils";
 
 import en from "../locales/en.json";
 import fr from "../locales/fr.json";
@@ -184,8 +184,8 @@ export default function MachinePage({ operator, machine, onLogout }) {
         color,
         status,
         shift, // use locally computed shift
-        cycle_start_time: cycleStart,
-        cycle_end_time: cycleEnd,
+        cycle_start_time: toTunisiaISO(cycleStart),
+        cycle_end_time: toTunisiaISO(cycleEnd),
       };
 
       const res = await api.post("/logs", payload);
