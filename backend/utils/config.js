@@ -42,36 +42,25 @@ function getSettingsPath() {
     return null;
 }
 
-let cachedSettings = null;
-let cachedDataPath = null;
+let lastLoggedDataPath = null;
 
 function loadSettings() {
-    if (cachedSettings) return cachedSettings;
-
     const settingsPath = getSettingsPath();
     if (!settingsPath) {
-        console.log("[Config] No settings.json found, using defaults");
-        cachedSettings = {};
-        return cachedSettings;
+        return {};
     }
 
     try {
-        console.log(`[Config] Reading settings: ${settingsPath}`);
         const content = fs.readFileSync(settingsPath, "utf-8");
-        cachedSettings = JSON.parse(content);
-        console.log(`[Config] Loaded Settings:`, cachedSettings);
+        return JSON.parse(content);
     } catch (err) {
         console.error("[Config] Error reading settings.json:", err);
-        cachedSettings = {};
+        return {};
     }
-
-    return cachedSettings;
 }
 
 // Function to resolve data directory
 export function getDataDir() {
-    if (cachedDataPath) return cachedDataPath;
-
     const settings = loadSettings();
     const settingsPath = getSettingsPath();
 
@@ -87,9 +76,13 @@ export function getDataDir() {
         }
     }
 
-    cachedDataPath = dataPath;
-    console.log(`[Config] Final Data Path: ${cachedDataPath} (Exists: ${fs.existsSync(cachedDataPath)})`);
-    return cachedDataPath;
+    // Only log if the path has changed to avoid spamming the console
+    if (dataPath !== lastLoggedDataPath) {
+        console.log(`[Config] Data Path active: ${dataPath} (Exists: ${fs.existsSync(dataPath)})`);
+        lastLoggedDataPath = dataPath;
+    }
+
+    return dataPath;
 }
 
 export function getMachineName() {
