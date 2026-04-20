@@ -1,0 +1,12 @@
+[
+  {
+    "session_id": "S_M11_20260416_1776313205457",
+    "machine_id": 11,
+    "operator_id": 1,
+    "badge": "3633",
+    "shift": "Shift1",
+    "started_at": "2026-04-16T05:20:05+01:00",
+    "last_heartbeat": "2026-04-16T05:20:05+01:00",
+    "ended_at": null
+  }
+]

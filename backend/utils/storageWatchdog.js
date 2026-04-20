@@ -1,6 +1,15 @@
 import fs from "fs";
 import { exec } from "child_process";
+import { util } from "util";
 import { getDataDir } from "./config.js";
+
+const execPromise = (command) => {
+    return new Promise((resolve) => {
+        exec(command, (error, stdout, stderr) => {
+            resolve({ error, stdout, stderr });
+        });
+    });
+};
 
 let isStorageConnected = true;
 
@@ -11,25 +20,36 @@ let isStorageConnected = true;
  */
 export async function checkStorageConnection() {
     const dataDir = getDataDir();
-    const exists = fs.existsSync(dataDir);
+
+    // Check if path exists
+    let exists = fs.existsSync(dataDir);
 
     if (!exists) {
         console.warn(`⚠️ [Watchdog] Storage path not found: ${dataDir}`);
-        isStorageConnected = false;
 
         // If it starts with a drive letter (e.g. "P:"), try to wake it up
         if (/^[a-zA-Z]:/.test(dataDir)) {
             const drive = dataDir.substring(0, 2);
-            console.log(`📡 [Watchdog] Attempting to reconnect drive ${drive}...`);
+            console.log(`📡 [Watchdog] Attempting to wake up drive ${drive}...`);
 
-            exec(`dir ${drive}`, (error) => {
-                if (error) {
-                    console.error(`❌ [Watchdog] Failed to reconnect ${drive}:`, error.message);
-                } else {
+            const { error } = await execPromise(`dir ${drive}`);
+
+            if (error) {
+                console.error(`❌ [Watchdog] Failed to wake up ${drive}:`, error.message);
+                isStorageConnected = false;
+            } else {
+                // Re-check existence after the wake-up command
+                exists = fs.existsSync(dataDir);
+                if (exists) {
                     console.log(`✅ [Watchdog] Drive ${drive} reconnected successfully.`);
                     isStorageConnected = true;
+                } else {
+                    console.warn(`⚠️ [Watchdog] Drive info returned OK, but path ${dataDir} still not found.`);
+                    isStorageConnected = false;
                 }
-            });
+            }
+        } else {
+            isStorageConnected = false;
         }
     } else {
         if (!isStorageConnected) {
@@ -50,11 +70,11 @@ export const initStorageWatchdog = () => {
     console.log(`📡 Initializing Storage Watchdog...`);
     console.log(`📂 Monitoring Path: ${dataDir}`);
 
-    // Initial check
+    // Initial check (async)
     checkStorageConnection();
 
     // Periodic check every 60 seconds
-    setInterval(() => {
-        checkStorageConnection();
+    setInterval(async () => {
+        await checkStorageConnection();
     }, 60000);
 };
