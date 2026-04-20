@@ -1,6 +1,5 @@
 import fs from "fs";
 import { exec } from "child_process";
-import { util } from "util";
 import { getDataDir } from "./config.js";
 
 const execPromise = (command) => {
