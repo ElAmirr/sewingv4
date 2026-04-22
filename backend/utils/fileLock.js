@@ -13,6 +13,7 @@ function getLockPath() {
  */
 export async function acquireLock(maxRetries = 100, retryWait = 100) {
   const lockPath = getLockPath();
+  const STALE_TIMEOUT = 30 * 1000; // 30 seconds
   let retries = 0;
 
   while (retries < maxRetries) {
@@ -22,7 +23,22 @@ export async function acquireLock(maxRetries = 100, retryWait = 100) {
       return true;
     } catch (err) {
       if (err.code === "EEXIST") {
-        // Lock already held, wait and retry
+        // Check if the lock is stale
+        try {
+          const stats = fs.statSync(lockPath);
+          const age = Date.now() - stats.mtimeMs;
+
+          if (age > STALE_TIMEOUT) {
+            console.warn(`[Lock] detected stale lock (age: ${Math.round(age / 1000)}s). Forcing release.`);
+            fs.rmdirSync(lockPath);
+            // Don't increment retries here, just try to mkdir again immediately
+            continue;
+          }
+        } catch (statErr) {
+          // If stat fails (e.g. lock was just deleted), ignore and retry mkdir
+        }
+
+        // Lock already held and not stale, wait and retry
         retries++;
         await new Promise(resolve => setTimeout(resolve, retryWait));
       } else {

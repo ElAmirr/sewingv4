@@ -25,6 +25,6 @@
   "select": "Sélectionner la machine",
   "muted": "Scannez une fois par poste — sélection de la machine obligatoire.",
   "error": "Échec du chargement des machines",
-  "server_ok": "SERVEUR: OK",
-  "server_error": "SERVEUR: ERREUR"
+  "server_ok": "SERVEUR: EN LIGNE",
+  "server_error": "SERVEUR: HORS SERVICE"
 }
