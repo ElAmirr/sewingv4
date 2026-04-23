@@ -234,7 +234,8 @@ function startBackend() {
         shell: false, // Use false to avoid overhead and escaping issues
         env: {
           ...process.env,
-          ELECTRON_RUN_AS_NODE: "1" // This is CRITICAL to run server.js with internal node
+          ELECTRON_RUN_AS_NODE: "1", // This is CRITICAL to run server.js with internal node
+          USER_DATA_PATH: app.getPath('userData')
         }
       });
 

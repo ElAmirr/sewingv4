@@ -7,38 +7,51 @@ const __dirname = path.dirname(__filename);
 
 // Helper to find the settings file
 function getSettingsPath() {
-    // Priority 1: Next to the executable (production)
-    // In Electron production, process.type exists. 
-    // We can check process.resourcesPath or specific relative paths.
+    // Priority 1: Persistent User Data (Sync'd from Electron)
+    const userDataPath = process.env.USER_DATA_PATH;
+    if (userDataPath) {
+        const persistentPath = path.join(userDataPath, "settings.json");
 
-    // When running as compiled executable, process.execPath is the exe.
-    // We often want settings.json to be in the same folder as the exe for portability, 
-    // or in a known userdata location.
+        // If persistent version doesn't exist yet, try to migrate from legacy/resources
+        if (!fs.existsSync(persistentPath)) {
+            const legacyPath = getLegacySettingsPath();
+            if (legacyPath) {
+                try {
+                    console.log(`[Config] Migrating settings from ${legacyPath} to ${persistentPath}`);
+                    // Ensure directory exists (though Electron usually handles this)
+                    if (!fs.existsSync(userDataPath)) {
+                        fs.mkdirSync(userDataPath, { recursive: true });
+                    }
+                    fs.copyFileSync(legacyPath, persistentPath);
+                } catch (err) {
+                    console.error("[Config] Migration failed:", err);
+                }
+            }
+        }
 
-    // For this request: "file dynamic... inside a file"
-    // Let's look for settings.json in the application root.
+        // If it exists now (or was just migrated), return it as the primary source of truth
+        if (fs.existsSync(persistentPath)) return persistentPath;
+    }
 
-    // Production: process.resourcesPath/../settings.json (folder with exe)
-    // or process.resourcesPath/settings.json
+    // Priority 2: Fallback to local/resources (legacy behavior or dev mode)
+    return getLegacySettingsPath();
+}
 
-    // Let's try to find it in the same directory as the executable first (if packed)
-    // or project root (if dev).
-
-    // Electron typically sets process.resourcesPath.
+function getLegacySettingsPath() {
+    // Same logic as before to find settings in app folder/resources
     const appRoot = process.env.PORTABLE_EXECUTABLE_DIR || path.dirname(process.execPath);
 
     const possibleSettings = [
         path.join(appRoot, "settings.json"), // Next to .exe
-        path.join(appRoot, "resources", "settings.json"), // Valid for many electron-builder configs
-        process.resourcesPath ? path.join(process.resourcesPath, "settings.json") : null, // In resources (if defined)
-        path.join(__dirname, "../../settings.json"), // Dev: backend/utils/../../settings.json
-        path.join(process.cwd(), "settings.json") // Fallback
+        path.join(appRoot, "resources", "settings.json"), // In resources
+        process.resourcesPath ? path.join(process.resourcesPath, "settings.json") : null,
+        path.join(__dirname, "../../settings.json"), // Dev
+        path.join(process.cwd(), "settings.json")
     ].filter(Boolean);
 
     for (const p of possibleSettings) {
         if (fs.existsSync(p)) return p;
     }
-
     return null;
 }
 
