@@ -10,13 +10,13 @@ export function toTunisiaISO(date = new Date()) {
 /**
  * Calculates the current 2-hour cycle boundaries and color based on the given time.
  * @param {Date} timeNow 
+ * @param {string[]} colorSequence - Optional custom color order from the server.
  * @returns {Object} { cycleStart, cycleEnd, color, shift }
  */
-export function getCycleInfo(timeNow) {
+export function getCycleInfo(timeNow, colorSequence = ["Blue", "Green", "Yellow", "Red"]) {
     const hourNow = timeNow.getHours();
     const cycleHour = hourNow - (hourNow % 2);
 
-    // Create new Date objects for the boundaries in local time
     const cycleStart = new Date(timeNow);
     cycleStart.setHours(cycleHour, 0, 0, 0);
 
@@ -24,10 +24,8 @@ export function getCycleInfo(timeNow) {
     cycleEnd.setHours(cycleStart.getHours() + 2);
 
     const cyclesSinceMidnight = Math.floor(cycleHour / 2);
-    const colors = ["Blue", "Green", "Yellow", "Red"];
-    const color = colors[cyclesSinceMidnight % colors.length];
+    const color = colorSequence[cyclesSinceMidnight % colorSequence.length];
 
-    // compute local shift
     let shift = "Shift1"; // 22:00 - 06:00
     if (hourNow >= 6 && hourNow < 14) shift = "Shift2";
     else if (hourNow >= 14 && hourNow < 22) shift = "Shift3";

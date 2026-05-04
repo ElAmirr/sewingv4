@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
-import { getMachineName } from "./utils/config.js";
+import { getMachineName, getDataDir } from "./utils/config.js";
 import { initScheduler } from "./utils/scheduler.js"; // Import scheduler
 
 import operatorRoutes from "./routes/operatorRoutes.js";
@@ -44,6 +44,20 @@ app.get("/events", (req, res) => {
 app.get("/config", (req, res) => {
   const machineName = getMachineName();
   res.json({ machineName });
+});
+
+app.get("/config/colors", (req, res) => {
+  try {
+    const dataDir = getDataDir();
+    const colorsPath = path.join(dataDir, "colors.json");
+    if (fs.existsSync(colorsPath)) {
+      const raw = fs.readFileSync(colorsPath, "utf-8");
+      const parsed = JSON.parse(raw);
+      return res.json({ sequence: parsed.sequence || ["Blue", "Green", "Yellow", "Red"] });
+    }
+  } catch (_) { }
+  // Default fallback
+  res.json({ sequence: ["Blue", "Green", "Yellow", "Red"] });
 });
 
 // ===== FRONTEND DIST SERVING =====

@@ -43,6 +43,7 @@ export default function MachinePage({ operator, machine, onLogout }) {
   const [timeNow, setTimeNow] = useState(new Date());
   const [submitting, setSubmitting] = useState(false);
   const [initialSyncComplete, setInitialSyncComplete] = useState(false);
+  const [colorSequence, setColorSequence] = useState(["Blue", "Green", "Yellow", "Red"]);
 
   /* ===================== LANGUAGE ===================== */
   const [lang, setLang] = useState(localStorage.getItem("lang") || "AR");
@@ -62,6 +63,15 @@ export default function MachinePage({ operator, machine, onLogout }) {
   useEffect(() => {
     const timer = setInterval(() => setTimeNow(new Date()), 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  /* ===================== COLOR SEQUENCE ===================== */
+  useEffect(() => {
+    api.get("/config/colors")
+      .then(res => {
+        if (res.data?.sequence?.length) setColorSequence(res.data.sequence);
+      })
+      .catch(() => { }); // Keep default on error
   }, []);
 
   /* ===================== SSE (Real-time logout) ===================== */
@@ -87,7 +97,7 @@ export default function MachinePage({ operator, machine, onLogout }) {
   }, []);
 
   /* ===================== CYCLE INFO ===================== */
-  const { cycleStart, cycleEnd, color, shift } = getCycleInfo(timeNow);
+  const { cycleStart, cycleEnd, color, shift } = getCycleInfo(timeNow, colorSequence);
   const cycleId = cycleStart.getTime();
 
   /* ===================== AUTO SYNC ===================== */
