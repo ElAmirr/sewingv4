@@ -64,6 +64,28 @@ export default function MachinePage({ operator, machine, onLogout }) {
     return () => clearInterval(timer);
   }, []);
 
+  /* ===================== SSE (Real-time logout) ===================== */
+  useEffect(() => {
+    const baseURL = window.location.protocol + "//" + window.location.hostname + ":5000";
+    const evtSource = new EventSource(`${baseURL}/events`);
+
+    evtSource.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        if (data.type === "session_ended") {
+          console.log("[SSE] Shift change received — logging out immediately.");
+          onLogout();
+        }
+      } catch (_) { }
+    };
+
+    evtSource.onerror = () => {
+      // EventSource auto-reconnects on error; no action needed
+    };
+
+    return () => evtSource.close();
+  }, []);
+
   /* ===================== CYCLE INFO ===================== */
   const { cycleStart, cycleEnd, color, shift } = getCycleInfo(timeNow);
   const cycleId = cycleStart.getTime();

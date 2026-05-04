@@ -1,4 +1,5 @@
 import { readData, writeData } from "./fileDb.js";
+import { broadcast } from "./sseManager.js";
 import { getDataDir } from "./config.js";
 import fs from "fs";
 import path from "path";
@@ -85,6 +86,9 @@ export async function logoutAllSessions() {
         } else {
             console.log("ℹ No active sessions were found to log out.");
         }
+
+        // Broadcast to all connected SSE clients (instant frontend logout)
+        broadcast("session_ended", { reason: "shift_change", totalUpdated });
 
     } catch (err) {
         console.error("❌ Auto-logout error:", err);

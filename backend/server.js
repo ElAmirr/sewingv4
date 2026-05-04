@@ -11,6 +11,7 @@ import operatorRoutes from "./routes/operatorRoutes.js";
 import machineRoutes from "./routes/machineRoutes.js";
 import needleLogsRoutes from "./routes/needleLogsRoutes.js";
 import { initStorageWatchdog, getStorageStatus } from "./utils/storageWatchdog.js";
+import { addClient } from "./utils/sseManager.js";
 
 dotenv.config();
 
@@ -33,6 +34,11 @@ app.use("/logs", needleLogsRoutes);
 app.get("/health/storage", (req, res) => {
   const isConnected = getStorageStatus();
   res.json({ connected: isConnected });
+});
+
+// SSE endpoint — clients subscribe here for real-time events
+app.get("/events", (req, res) => {
+  addClient(req, res);
 });
 
 app.get("/config", (req, res) => {
