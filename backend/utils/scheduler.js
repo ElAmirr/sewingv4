@@ -4,6 +4,7 @@ import { getDataDir } from "./config.js";
 import fs from "fs";
 import path from "path";
 import { getTunisiaISO } from "./timeHelper.js";
+import { loadSchedule, getTriggerTimesForDay } from "./scheduleHelper.js";
 
 /**
  * Initializes the cron jobs for auto-logout without external dependencies.
@@ -12,11 +13,12 @@ import { getTunisiaISO } from "./timeHelper.js";
 export const initScheduler = () => {
     console.log("⏳ Initializing Tunisia-Local Auto-Logout Scheduler...");
 
-    // Check every minute (60,000 ms)
     setInterval(() => {
         const now = new Date();
+        const dayOfWeek = now.getDay();
+        const schedule = loadSchedule();
+        const triggerTimes = getTriggerTimesForDay(dayOfWeek, schedule);
 
-        // Use Tunisia local time for triggers
         const localTimeString = now.toLocaleString("en-GB", {
             timeZone: "Africa/Tunis",
             hour: "2-digit",
@@ -24,16 +26,13 @@ export const initScheduler = () => {
             hour12: false
         });
 
-        // Local Tunisia transition times (1 minute before end of shifts)
-        const triggerTimes = ["05:59", "13:59", "21:59"];
-
         if (triggerTimes.includes(localTimeString)) {
-            console.log(`⏰ Triggering Early Staggered Logout at ${localTimeString} Tunisia Time`);
+            console.log(`⏰ Triggering Auto-Logout at ${localTimeString} (Day ${dayOfWeek}, triggers: ${triggerTimes.join(", ")})`);
             logoutAllSessions();
         }
     }, 60000);
 
-    console.log("✅ Native scheduler initialized (Checks every 60s, triggers 1m early).");
+    console.log("✅ Native scheduler initialized (Checks every 60s, schedule-aware).");
 };
 
 /**

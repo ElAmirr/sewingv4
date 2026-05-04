@@ -8,12 +8,31 @@ export function toTunisiaISO(date = new Date()) {
 }
 
 /**
+ * Finds which shift the given hour belongs to, using the schedule.
+ */
+function getShiftFromSchedule(dayOfWeek, hour, schedule) {
+    const DEFAULT_FALLBACK = "Shift1";
+    if (!schedule) return DEFAULT_FALLBACK;
+
+    const group = Object.values(schedule).find(g => g.days && g.days.includes(dayOfWeek));
+    if (!group) return DEFAULT_FALLBACK;
+
+    const matched = group.shifts.find(s => {
+        if (s.start < s.end) return hour >= s.start && hour < s.end;
+        return hour >= s.start || hour < s.end; // overnight
+    });
+
+    return matched ? matched.name : DEFAULT_FALLBACK;
+}
+
+/**
  * Calculates the current 2-hour cycle boundaries and color based on the given time.
  * @param {Date} timeNow 
  * @param {string[]} colorSequence - Optional custom color order from the server.
+ * @param {object|null} schedule - Optional schedule from the server.
  * @returns {Object} { cycleStart, cycleEnd, color, shift }
  */
-export function getCycleInfo(timeNow, colorSequence = ["Blue", "Green", "Yellow", "Red"]) {
+export function getCycleInfo(timeNow, colorSequence = ["Blue", "Green", "Yellow", "Red"], schedule = null) {
     const hourNow = timeNow.getHours();
     const cycleHour = hourNow - (hourNow % 2);
 
@@ -26,9 +45,7 @@ export function getCycleInfo(timeNow, colorSequence = ["Blue", "Green", "Yellow"
     const cyclesSinceMidnight = Math.floor(cycleHour / 2);
     const color = colorSequence[cyclesSinceMidnight % colorSequence.length];
 
-    let shift = "Shift1"; // 22:00 - 06:00
-    if (hourNow >= 6 && hourNow < 14) shift = "Shift2";
-    else if (hourNow >= 14 && hourNow < 22) shift = "Shift3";
+    const shift = getShiftFromSchedule(timeNow.getDay(), hourNow, schedule);
 
     return { cycleStart, cycleEnd, color, shift };
 }

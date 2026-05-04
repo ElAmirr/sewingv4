@@ -1,6 +1,7 @@
 import { readData, writeData } from "../utils/fileDb.js";
 import { generateSessionId, parseSessionId, getSessionFilePath, getActiveSessions } from "../utils/sessionUtils.js";
 import { getTunisiaISO } from "../utils/timeHelper.js";
+import { loadSchedule, getShiftForDate } from "../utils/scheduleHelper.js";
 
 // ---------------- Controllers ----------------
 
@@ -30,15 +31,9 @@ export const loginOperator = async (req, res) => {
     });
   }
 
-  // Determine shift (using local Tunisia hour)
-  // Shift 1: 22:00 - 06:00
-  // Shift 2: 06:00 - 14:00
-  // Shift 3: 14:00 - 22:00
-  const hour = Number(new Date().toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: 'Africa/Tunis' }));
-  const shift =
-    hour >= 6 && hour < 14 ? "Shift2" :
-      hour >= 14 && hour < 22 ? "Shift3" :
-        "Shift1";
+  // Determine shift using schedule.json (dynamic, day-aware)
+  const schedule = loadSchedule();
+  const shift = getShiftForDate(new Date(), schedule);
 
   try {
     const operators = await readData("operators.json");

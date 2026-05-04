@@ -5,6 +5,7 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import { getMachineName, getDataDir } from "./utils/config.js";
+import { loadSchedule } from "./utils/scheduleHelper.js";
 import { initScheduler } from "./utils/scheduler.js"; // Import scheduler
 
 import operatorRoutes from "./routes/operatorRoutes.js";
@@ -44,6 +45,10 @@ app.get("/events", (req, res) => {
 app.get("/config", (req, res) => {
   const machineName = getMachineName();
   res.json({ machineName });
+});
+
+app.get("/config/schedule", (req, res) => {
+  res.json(loadSchedule());
 });
 
 app.get("/config/colors", (req, res) => {
