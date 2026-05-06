@@ -1,23 +1,112 @@
+/* ============================================================
+   GLOBAL DESIGN SYSTEM — Glassmorphism Premium v1.4.4
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 :root {
-  --bg: #ffffff;
-  --card-bg: rgba(255, 255, 255, 0.06);
-  --glass-blue: rgba(18, 76, 153, 0.18);
-  --accent: #0ea5ff;
-  --muted: rgba(255, 255, 255, 0.7);
+  --bg-from: #0a0e27;
+  --bg-to: #0d1b3e;
+  --glass: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-strong: rgba(255, 255, 255, 0.11);
+  --accent: #38bdf8;
+  --accent2: #818cf8;
+  --muted: rgba(255, 255, 255, 0.60);
+  --text: #f0f6ff;
+  --radius: 18px;
+  --blur: blur(20px) saturate(160%);
 }
 
-/* App background */
+/* ======================== BASE ======================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body,
 html,
 #root {
   height: 100%;
   margin: 0;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  background: #ffffff;
-  color: #fff;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  color: var(--text);
+  overflow: hidden;
 }
 
-/* Aggressive Mini-Mode Fixes */
+/* ======================== ANIMATED BACKGROUND ======================== */
+.dashboard,
+.center-screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: var(--text);
+  background: linear-gradient(135deg, #06091a 0%, #0d1b3e 40%, #0e1a4a 70%, #080c22 100%);
+  overflow: hidden;
+}
+
+/* Floating orbs */
+.dashboard::before,
+.center-screen::before {
+  content: '';
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+  top: -140px;
+  left: -120px;
+  animation: orbFloat 12s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.dashboard::after,
+.center-screen::after {
+  content: '';
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(129, 140, 248, 0.13) 0%, transparent 70%);
+  bottom: -100px;
+  right: -80px;
+  animation: orbFloat 15s ease-in-out infinite alternate-reverse;
+  pointer-events: none;
+}
+
+@keyframes orbFloat {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+
+  to {
+    transform: translate(30px, 40px) scale(1.08);
+  }
+}
+
+/* ======================== GLASS CARD ======================== */
+.glass-card {
+  background: var(--glass);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--glass-border);
+  position: relative;
+  z-index: 1;
+}
+
+.blue-glass {
+  background: linear-gradient(135deg, rgba(14, 36, 89, 0.35), rgba(6, 10, 28, 0.30));
+  box-shadow: 0 8px 32px rgba(4, 20, 80, 0.6), inset 0 1px 0 rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.16);
+}
+
+/* ======================== MINI MODE ======================== */
 html.mini-mode,
 .mini-mode body,
 .mini-mode #root,
@@ -27,22 +116,37 @@ html.mini-mode,
   overflow: hidden !important;
   min-width: 0 !important;
   min-height: 0 !important;
-  width: 120px !important;
-  height: 120px !important;
 }
 
 .mini-mode ::-webkit-scrollbar {
   display: none !important;
 }
 
-/* Center login screen */
-.center-screen {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
+.mini-mode * {
+  scrollbar-width: none !important;
 }
 
+.mini-mode .dashboard,
+.mini-mode .center-screen {
+  background: transparent !important;
+  background-image: none !important;
+}
+
+.mini-mode .dashboard::before,
+.mini-mode .dashboard::after,
+.mini-mode .center-screen::before,
+.mini-mode .center-screen::after {
+  display: none !important;
+}
+
+.mini-mode .top-bar,
+.mini-mode .status-card,
+.mini-mode .action-card {
+  box-shadow: none !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ======================== LOGIN ======================== */
 .login-card {
   width: 630px;
 }
@@ -51,90 +155,95 @@ html.mini-mode,
   width: 125px;
 }
 
-/* Glass card */
-.glass-card {
-  background: var(--card-bg);
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-  backdrop-filter: 5lur(8px) saturate(120%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-/* Blue tint glass */
-.blue-glass {
-  background: linear-gradient(135deg, rgba(18, 76, 153, 0.12), rgba(8, 12, 30, 0.1));
-  box-shadow: 0 8px 30px rgba(4, 20, 60, 0.5);
-  border: 1px solid rgba(18, 76, 153, 0.18);
-}
-
-/* Buttons */
+/* ======================== BUTTONS ======================== */
 .btn {
-  padding: 16px 20px;
-  border-radius: 10px;
-  border: 1px solid rgb(255, 255, 255);
+  padding: 14px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
   cursor: pointer;
   font-weight: 600;
+  font-size: 0.95rem;
   margin-right: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  color: #e6f0ff;
+  background: var(--glass-strong);
+  color: var(--text);
+  backdrop-filter: blur(10px);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+
+.btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.15);
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
 }
 
 .btn.primary {
-  background: linear-gradient(90deg, #0066ff, #00a3ff);
-  color: white;
-  box-shadow: 0 6px 20px rgba(0, 100, 255, 0.2);
+  background: linear-gradient(135deg, #1d6fff, #38bdf8);
+  border: none;
+  color: #fff;
+  box-shadow: 0 6px 24px rgba(29, 111, 255, 0.35);
 }
 
-
-/* Styling for when a button has been successfully clicked/verified */
-.btn-success {
-  background-color: #28a745 !important;
-  /* Green */
-  color: white !important;
-  pointer-events: none;
-  /* Optional: prevent double clicks */
-  opacity: 0.8;
-  border: none !important;
+.btn.primary:hover {
+  box-shadow: 0 8px 32px rgba(56, 189, 248, 0.45);
+  background: linear-gradient(135deg, #2575ff, #38d2f8);
 }
 
+.btn.big {
+  font-size: 20px;
+  padding: 18px;
+  letter-spacing: 0.3px;
+}
 
-
+.btn.small {
+  padding: 6px 10px;
+  font-size: 0.85rem;
+}
 
 .btn.outline {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255);
+  border: 1px solid rgba(255, 255, 255, 0.22);
 }
 
-/* small */
-.btn.small {
-  padding: 6px 8px;
-  font-size: 0.9rem;
+.btn-success {
+  background: linear-gradient(135deg, #059669, #10b981) !important;
+  color: white !important;
+  border: none !important;
+  pointer-events: none;
+  opacity: 0.9;
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35) !important;
 }
 
-/* logout */
 .logout {
   width: 130px;
-  border: 1px solid rgb(255, 255, 255);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-/* input */
+/* ======================== INPUTS ======================== */
 .input {
   width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(255, 255, 255, 0.02);
-  color: #fff;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  font-size: 0.95rem;
   margin-top: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  backdrop-filter: blur(8px);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
 }
 
 .input::placeholder {
-  color: #ffffff;
-}
-
-input:focus {
-  outline: none;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 select:focus {
@@ -142,12 +251,17 @@ select:focus {
   box-shadow: none;
 }
 
-/* Radio Group */
+select option {
+  background: #0d1b3e;
+  color: #fff;
+}
+
+/* ======================== RADIO GROUP ======================== */
 .radio-group {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin: 15px 0 25px 0;
+  gap: 10px;
+  margin: 14px 0 22px;
   width: 100%;
 }
 
@@ -155,34 +269,32 @@ select:focus {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px;
+  padding: 14px 16px;
   border-radius: 12px;
-  background: rgba(18, 76, 153, 0.1);
-  border: 1px solid rgba(18, 76, 153, 0.2);
+  background: rgba(56, 189, 248, 0.06);
+  border: 1px solid rgba(56, 189, 248, 0.12);
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
   width: 100%;
-  box-sizing: border-box;
-  /* Crucial for width alignment */
 }
 
 .radio-option:hover {
-  background: rgba(18, 76, 153, 0.15);
-  border-color: rgba(14, 165, 255, 0.5);
+  background: rgba(56, 189, 248, 0.10);
+  border-color: rgba(56, 189, 248, 0.30);
 }
 
 .radio-option.selected {
-  background: rgba(14, 165, 255, 0.15);
+  background: rgba(56, 189, 248, 0.14);
   border-color: var(--accent);
-  box-shadow: 0 0 15px rgba(14, 165, 255, 0.2);
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.18);
 }
 
 .radio-circle {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -195,8 +307,8 @@ select:focus {
 }
 
 .radio-inner {
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background: var(--accent);
   transform: scale(0);
@@ -209,30 +321,47 @@ select:focus {
 
 .radio-label {
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.97rem;
   color: var(--muted);
 }
 
 .selected .radio-label {
-  color: #fff;
+  color: var(--text);
 }
 
-/* Modal Layout Adjustments */
+/* ======================== MODAL ======================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 6, 23, 0.60);
+  z-index: 200;
+  backdrop-filter: blur(28px) saturate(130%);
+}
+
+.modal {
+  width: 420px;
+  max-width: 94%;
+}
+
 .modal-field {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
   width: 100%;
 }
 
 .modal-field .label {
   display: block;
   margin-bottom: 8px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: var(--muted);
+  font-weight: 500;
 }
 
 .field-error {
-  color: #ff4d4d;
-  font-size: 0.85rem;
+  color: #f87171;
+  font-size: 0.83rem;
   margin-top: 6px;
   font-weight: 500;
   display: flex;
@@ -242,17 +371,17 @@ select:focus {
 
 .btn-row {
   display: flex;
-  gap: 12px;
+  gap: 10px;
+  margin-top: 12px;
   width: 100%;
 }
 
 .btn-row .btn {
   flex: 1;
   margin-right: 0;
-  /* Override default margin */
 }
 
-/* Server Health Status Indicators */
+/* ======================== STATUS INDICATORS ======================== */
 .status-indicator {
   display: flex;
   align-items: center;
@@ -260,44 +389,49 @@ select:focus {
 }
 
 .status-dot {
-  width: 25px;
-  height: 25px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   display: inline-block;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
 }
 
 .status-dot.online {
   background-color: #10b981;
-  /* Green */
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+  animation: statusPulse 2.5s ease-in-out infinite;
 }
 
 .status-dot.offline {
   background-color: #ef4444;
-  /* Red */
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+@keyframes statusPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.60);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.00);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.00);
+  }
 }
 
 .status-label {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   color: var(--muted);
 }
 
 .status-dot.offline+.status-label {
-  color: #ef4444;
+  color: #f87171;
 }
 
-select option {
-  border-radius: 80px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(138, 138, 138, 0.5);
-  color: rgba(0, 0, 0);
-}
-
-/* layout */
+/* ======================== LAYOUT ======================== */
 .page-wrap {
   padding: 16px;
   min-height: 100vh;
@@ -310,7 +444,6 @@ select option {
   margin-bottom: 14px;
 }
 
-/* main content */
 .content {
   display: flex;
   gap: 16px;
@@ -324,185 +457,34 @@ select option {
   flex: 1;
 }
 
-/* machine list */
-.machine-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.machine-list li {
-  padding: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-bottom: 8px;
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.machine-list li.active {
-  border: 1px solid rgba(0, 150, 255, 0.14);
-  box-shadow: inset 0 0 12px rgba(0, 120, 255, 0.03);
-}
-
-/* status row */
-.status-row {
-  display: flex;
-  gap: 18px;
-  align-items: center;
-}
-
-.color_label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.color_label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 .muted {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: .95rem;
+  color: var(--muted);
+  font-size: 0.93rem;
 }
 
-.color-pill {
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-weight: 700;
-  display: inline-block;
-  backdrop-filter: blur(5px) saturate(120%);
+.center {
+  text-align: center;
 }
 
-.color-blue {
-  height: 80px;
-  width: 80px;
-  border-radius: 50%;
-  background-color: blue;
-}
-
-.color-green {
-  height: 80px;
-  width: 80px;
-  border-radius: 50%;
-  background-color: green;
-}
-
-.color-yellow {
-  height: 80px;
-  width: 80px;
-  border-radius: 50%;
-  background-color: yellow;
-}
-
-.color-red {
-  height: 80px;
-  width: 80px;
-  border-radius: 50%;
-  background-color: red;
-}
-
-/* timer */
-.timer-box {
-  padding: 30px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.big-time {
-  font-size: 48px;
-  font-weight: 700;
-}
-
-/* modal */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(2, 6, 23, 0.45);
-  z-index: 200;
-  backdrop-filter: blur(20px) saturate(120%);
-}
-
-.modal {
-  width: 420px;
-  max-width: 94%;
-}
-
-/* helper text */
 .error {
-  color: #ff0000;
+  color: #f87171;
   margin-top: 8px;
 }
 
-.btn-row {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-/* ================= DASHBOARD ================= */
-
-.dashboard,
-.center-screen {
-  background-image: url("./pexels-cottonbro-6660921.jpg");
-
-  background-position: center;
-  background-size: cover;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  color: #fff;
-}
-
-/* Scaling Original Content for Mini-Mode */
-.mini-mode .mini-content-scaled {
-  transform: scale(0.24);
-  /* 500px -> 120px */
-  transform-origin: top left;
-  width: 500px !important;
-  height: 1080px !important;
-  /* Spans full sidebar height */
-  pointer-events: none;
-  /* Let clicks pass to the button */
-  opacity: 0.6;
-  /* Fade out original content slightly */
-}
-
-.mini-mode .dashboard,
-.mini-mode .center-screen {
-  background-image: none !important;
-  background: transparent !important;
-}
-
-.mini-mode .top-bar,
-.mini-mode .status-card,
-.mini-mode .action-card {
-  box-shadow: none !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-/* TOP BAR */
+/* ======================== TOP BAR ======================== */
 .top-bar {
   width: 720px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 30px;
-  background: rgba(2, 6, 23, 0.45);
-  border-radius: 14px;
+  background: rgba(6, 10, 30, 0.55);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
   margin: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .top-bar-container {
@@ -510,7 +492,7 @@ select option {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 28px;
+  padding: 22px 28px;
 }
 
 .top-item {
@@ -522,17 +504,17 @@ select option {
 
 .logo {
   content: url("./forvia_log.png");
-  width: 60px;
-  border: 2px solid rgb(8, 10, 151);
+  width: 56px;
+  border: 2px solid #1d40af;
   background-color: #fff;
   border-radius: 8px;
-  padding: 8px;
+  padding: 6px;
 }
 
 .flag {
   content: url("./Flag_of_Tunisia.svg\ -\ Edited.png");
-  height: 30px;
-  width: 30px;
+  height: 28px;
+  width: 28px;
   border-radius: 50px;
   margin-left: 10px;
 }
@@ -563,26 +545,28 @@ select option {
   gap: 10px;
 }
 
-
-
-/* MAIN */
+/* ======================== MAIN PANEL ======================== */
 .main-panel {
   width: 720px;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
+  gap: 20px;
+  position: relative;
+  z-index: 1;
 }
 
-/* STATUS CARD */
+/* ======================== STATUS CARD ======================== */
 .status-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  align-items: center;
-  background: rgba(2, 6, 23, 0.45);
-  padding: 28px;
-  border-radius: 18px;
-
+  background: rgba(6, 12, 36, 0.55);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  padding: 26px 28px;
+  border-radius: var(--radius);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .status-right {
@@ -595,32 +579,111 @@ select option {
   justify-content: space-around;
   align-items: center;
   padding: 16px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.5);
-
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-/* ACTIONS */
+/* ======================== ACTION CARD ======================== */
 .action-card {
-  background: rgba(2, 6, 23, 0.45);
-  padding: 28px;
-  border-radius: 18px;
+  background: rgba(6, 12, 36, 0.55);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  padding: 26px 28px;
+  border-radius: var(--radius);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
-.btn.big {
-  font-size: 20px;
-  padding: 16px;
+/* ======================== COLOR CIRCLES ======================== */
+.color-blue {
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #60a5fa, #1d4ed8);
+  box-shadow: 0 0 28px rgba(96, 165, 250, 0.65), 0 0 10px rgba(96, 165, 250, 0.4);
+  border: 2px solid rgba(147, 197, 253, 0.35);
 }
 
-.center {
-  text-align: center;
+.color-green {
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #4ade80, #15803d);
+  box-shadow: 0 0 28px rgba(74, 222, 128, 0.65), 0 0 10px rgba(74, 222, 128, 0.4);
+  border: 2px solid rgba(134, 239, 172, 0.35);
 }
 
+.color-yellow {
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fde047, #ca8a04);
+  box-shadow: 0 0 28px rgba(253, 224, 71, 0.65), 0 0 10px rgba(253, 224, 71, 0.4);
+  border: 2px solid rgba(253, 224, 71, 0.35);
+}
 
+.color-red {
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f87171, #b91c1c);
+  box-shadow: 0 0 28px rgba(248, 113, 113, 0.65), 0 0 10px rgba(248, 113, 113, 0.4);
+  border: 2px solid rgba(252, 165, 165, 0.35);
+}
 
+.color-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 700;
+  display: inline-block;
+  backdrop-filter: blur(6px) saturate(130%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.big-color {
+  display: flex;
+  justify-content: center;
+  font-size: 34px;
+  padding: 14px 24px;
+  border-radius: var(--radius);
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+/* ======================== COLOR LABELS ======================== */
+.color_label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* ======================== TIMER BOX ======================== */
+.timer-box {
+  padding: 28px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.40);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  backdrop-filter: blur(10px);
+}
+
+.big-time {
+  font-size: 46px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--text);
+  text-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
+}
+
+/* ======================== NEEDLE IMAGES ======================== */
 .needle-color-red,
 .needle-color-blue,
 .needle-color-green,
@@ -646,18 +709,42 @@ select option {
   content: url('./needle_yellow.png');
 }
 
-/* BIG COLOR */
-.big-color {
+/* ======================== STATUS ROW ======================== */
+.status-row {
   display: flex;
-  justify-content: center;
-  font-size: 36px;
-  padding: 16px 26px;
-  border-radius: 14px;
-  font-weight: bold;
+  gap: 18px;
+  align-items: center;
 }
 
-/* ================= FINAL AGGRESSIVE MINI MODE RESET ================= */
-/* This MUST stay at the bottom of the file to guarantee total override */
+/* ======================== MACHINE LIST ======================== */
+.machine-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.machine-list li {
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  background: var(--glass);
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.machine-list li.active {
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  box-shadow: inset 0 0 14px rgba(56, 189, 248, 0.08);
+}
+
+/* ======================== LANGUAGE SELECTOR ======================== */
+.select-lang {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ======================== MINI MODE FINAL OVERRIDES ======================== */
 html.mini-mode,
 .mini-mode body,
 .mini-mode #root,
@@ -670,44 +757,21 @@ html.mini-mode,
   margin: 0 !important;
   padding: 0 !important;
   display: block !important;
-  background-image: url("./pexels-cottonbro-6660921.jpg") !important;
-  background-position: center !important;
-  background-size: cover !important;
+  background: linear-gradient(135deg, #06091a 0%, #0d1b3e 100%) !important;
 }
 
-.mini-mode ::-webkit-scrollbar {
-  display: none !important;
-}
-
-.mini-mode * {
-  scrollbar-width: none !important;
-}
-
-/* Scaling the dashboard content for mini mode */
 .mini-mode .mini-content-scaled {
-  /* Decreased from 0.6 to fit more content */
   transform-origin: center center;
   width: 1142px !important;
-  /* 400 / 0.35 ≈ 1142px */
   height: 514px !important;
-  /* 180 / 0.35 ≈ 514px */
   pointer-events: none;
-  /* Let clicks pass to the overlay */
   opacity: 1;
-  /* Reset opacity to full as requested */
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -40%) scale(0.25);
-  /* Reduced scale to fit 180px height better */
 }
 
-.mini-mode .dashboard {
-  background-image: none !important;
-  background: transparent !important;
-}
-
-/* THE FLOATING MINI-APP OVERLAY */
 .mini-view-overlay.no-drag {
   -webkit-app-region: no-drag;
   border: none !important;
@@ -716,7 +780,6 @@ html.mini-mode,
   width: 100% !important;
   height: 100% !important;
   display: block !important;
-  /* Drag handled by container */
   cursor: pointer;
   position: absolute;
   top: 0;
@@ -728,7 +791,6 @@ html.mini-mode,
   cursor: grabbing;
 }
 
-/* RE-ENABLE CLICK RESTORE: Separate drag from click */
 .mini-view-container.drag-region {
   -webkit-app-region: drag !important;
   width: 100% !important;
