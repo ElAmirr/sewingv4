@@ -80,6 +80,14 @@ export default function MachinePage({ operator, machine, onLogout }) {
         if (res.data?.sequence?.length) setColorSequence(res.data.sequence);
       })
       .catch(() => { });
+
+    // Tell Electron to unmute and enforce volume at each cycle boundary
+    try {
+      const { ipcRenderer } = window.require("electron");
+      ipcRenderer.send("ensure-volume");
+    } catch (_) {
+      // Not running inside Electron (e.g. dev browser) — safe to ignore
+    }
   }, [cycleId]); // cycleId changes every 2 hours → auto re-fetch
 
   /* ===================== SSE (Real-time logout) ===================== */
