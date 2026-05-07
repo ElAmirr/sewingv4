@@ -66,19 +66,21 @@ export default function MachinePage({ operator, machine, onLogout }) {
     return () => clearInterval(timer);
   }, []);
 
-  /* ===================== COLOR SEQUENCE ===================== */
+  /* ===================== SCHEDULE (fetched once) ===================== */
+  useEffect(() => {
+    api.get("/config/schedule")
+      .then(res => { if (res.data) setSchedule(res.data); })
+      .catch(() => { });
+  }, []);
+
+  /* ===================== COLOR SEQUENCE (re-fetched each cycle) ===================== */
   useEffect(() => {
     api.get("/config/colors")
       .then(res => {
         if (res.data?.sequence?.length) setColorSequence(res.data.sequence);
       })
       .catch(() => { });
-    api.get("/config/schedule")
-      .then(res => {
-        if (res.data) setSchedule(res.data);
-      })
-      .catch(() => { });
-  }, []);
+  }, [cycleId]); // cycleId changes every 2 hours → auto re-fetch
 
   /* ===================== SSE (Real-time logout) ===================== */
   useEffect(() => {
