@@ -69,19 +69,17 @@ app.get("/config/colors", (req, res) => {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// process.resourcesPath is only defined in Electron main process.
-// In the backend Node.js subprocess, it may be undefined — guard it.
-const resourcesPath = process.resourcesPath || "";
-
 // path to frontend/dist
 let frontendDistPath = path.join(__dirname, "../frontend/dist");
 
-if (!fs.existsSync(frontendDistPath) && resourcesPath) {
-  frontendDistPath = path.join(resourcesPath, "frontend/dist");
+if (!fs.existsSync(frontendDistPath)) {
+  // Fallback for production build
+  frontendDistPath = path.join(process.resourcesPath, "frontend/dist");
 }
 
-if (!fs.existsSync(frontendDistPath) && resourcesPath) {
-  frontendDistPath = path.join(resourcesPath, "app/frontend/dist");
+if (!fs.existsSync(frontendDistPath)) {
+  // Second fallback for another common production location
+  frontendDistPath = path.join(process.resourcesPath, "app/frontend/dist");
 }
 
 console.log(`Frontend assets path: ${frontendDistPath}`);

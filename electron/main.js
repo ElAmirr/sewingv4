@@ -39,7 +39,7 @@ function createWindow() {
   log('Creating main window...');
   try {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-    const halfWindowWidth = width / 2;
+    const halfWindowWidth = width < 1200 ? width / 1.5 : width / 2;
 
     mainWindow = new BrowserWindow({
       width: halfWindowWidth,
@@ -86,13 +86,13 @@ function createMiniWindow() {
   const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
 
   miniWindow = new BrowserWindow({
-    width: 350,
+    width: 200,
     height: 180,
-    x: screenWidth - 370,
-    y: screenHeight - 320,
+    x: screenWidth - 200,
+    y: screenHeight - 180,
     frame: false,
     transparent: true,
-    backgroundColor: '#00000000',
+    backgroundColor: 'rgba(31, 30, 30, 0)',
     hasShadow: false,
     alwaysOnTop: true,
     skipTaskbar: true,
@@ -189,34 +189,6 @@ ipcMain.on("restore-window", () => {
 
 ipcMain.on("close-window", () => {
   if (mainWindow) mainWindow.close();
-});
-
-// Ensure system volume is on at each cycle boundary
-ipcMain.on("ensure-volume", () => {
-  log('[Volume] Received ensure-volume request — enforcing system volume...');
-
-  const possiblePaths = [
-    path.join(__dirname, "ensure-volume.ps1"),
-    path.join(process.resourcesPath || "", "ensure-volume.ps1"),
-    path.join(app.getAppPath().replace("app.asar", "app.asar.unpacked"), "electron/ensure-volume.ps1"),
-  ];
-  const scriptPath = possiblePaths.find(p => fs.existsSync(p));
-
-  if (!scriptPath) {
-    log('[Volume] ensure-volume.ps1 not found, skipping.');
-    return;
-  }
-
-  const ps = spawn("powershell", [
-    "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", scriptPath
-  ], { stdio: "pipe" });
-
-  ps.on("close", (code) => {
-    if (code === 0) log('[Volume] Volume enforced successfully.');
-    else log(`[Volume] PowerShell exited with code ${code}`);
-  });
-
-  ps.on("error", (err) => log(`[Volume] Error: ${err.message}`));
 });
 
 function startBackend() {
