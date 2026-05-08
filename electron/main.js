@@ -39,7 +39,7 @@ function createWindow() {
   log('Creating main window...');
   try {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-    const halfWindowWidth = width < 1200 ? width / 1.5 : width / 2;
+    const halfWindowWidth = width / 2;
 
     mainWindow = new BrowserWindow({
       width: halfWindowWidth,
